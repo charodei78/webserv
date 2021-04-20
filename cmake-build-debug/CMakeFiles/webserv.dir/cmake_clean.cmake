@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/webserv.dir/Helper.cpp.o"
+  "CMakeFiles/webserv.dir/Request.cpp.o"
   "CMakeFiles/webserv.dir/Response.cpp.o"
   "CMakeFiles/webserv.dir/Server.cpp.o"
   "CMakeFiles/webserv.dir/main.cpp.o"

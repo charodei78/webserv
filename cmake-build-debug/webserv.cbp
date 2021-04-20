@@ -83,16 +83,31 @@
 		<Unit filename="/Users/hheimerd/CLionProjects/webserv/ENV.h">
 			<Option target="webserv"/>
 		</Unit>
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Helper.cpp">
+			<Option target="webserv"/>
+		</Unit>
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Helper.hpp">
+			<Option target="webserv"/>
+		</Unit>
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Request.cpp">
+			<Option target="webserv"/>
+		</Unit>
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Request.hpp">
+			<Option target="webserv"/>
+		</Unit>
 		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Response.cpp">
 			<Option target="webserv"/>
 		</Unit>
-		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Response.h">
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Response.hpp">
 			<Option target="webserv"/>
 		</Unit>
 		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Server.cpp">
 			<Option target="webserv"/>
 		</Unit>
 		<Unit filename="/Users/hheimerd/CLionProjects/webserv/Server.hpp">
+			<Option target="webserv"/>
+		</Unit>
+		<Unit filename="/Users/hheimerd/CLionProjects/webserv/includes.hpp">
 			<Option target="webserv"/>
 		</Unit>
 		<Unit filename="/Users/hheimerd/CLionProjects/webserv/main.cpp">

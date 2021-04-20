@@ -10,21 +10,39 @@
 string
 -
 
-/Users/hheimerd/CLionProjects/webserv/Response.cpp
-Response.h
-/Users/hheimerd/CLionProjects/webserv/Response.h
+/Users/hheimerd/CLionProjects/webserv/Helper.hpp
+includes.hpp
+/Users/hheimerd/CLionProjects/webserv/includes.hpp
 
-/Users/hheimerd/CLionProjects/webserv/Response.h
+/Users/hheimerd/CLionProjects/webserv/Request.cpp
+Request.hpp
+/Users/hheimerd/CLionProjects/webserv/Request.hpp
+
+/Users/hheimerd/CLionProjects/webserv/Request.hpp
+includes.hpp
+/Users/hheimerd/CLionProjects/webserv/includes.hpp
+
+/Users/hheimerd/CLionProjects/webserv/includes.hpp
 map
 -
 ENV.h
 /Users/hheimerd/CLionProjects/webserv/ENV.h
 string
 -
-
-/Users/hheimerd/CLionProjects/webserv/main.cpp
 iostream
 -
-Response.h
-/Users/hheimerd/CLionProjects/webserv/Response.h
+sys/socket.h
+-
+unistd.h
+-
+cerrno
+-
+netinet/in.h
+-
+cstring
+-
+Helper.hpp
+/Users/hheimerd/CLionProjects/webserv/Helper.hpp
+vector
+/Users/hheimerd/CLionProjects/webserv/vector
 

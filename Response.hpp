@@ -2,12 +2,10 @@
 // Created by Holli Heimerdinger on 4/18/21.
 //
 
-#ifndef WEBSERV_RESPONSE_H
-#define WEBSERV_RESPONSE_H
+#ifndef WEBSERV_RESPONSE_HPP
+#define WEBSERV_RESPONSE_HPP
 
-#include <map>
-#include "ENV.h"
-#include <string>
+#include "includes.hpp"
 
 using namespace std;
 
@@ -37,4 +35,4 @@ namespace Http {
 }
 
 
-#endif //WEBSERV_RESPONSE_H
+#endif //WEBSERV_RESPONSE_HPP
