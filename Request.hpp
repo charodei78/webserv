@@ -21,16 +21,14 @@ namespace Http {
 	{
 		Request();
 	public:
-
 		query_s query_string;
 		string  body;
 		map<string, string> headers;
+
 		Request(const string& body);
 		Request(Request const &rhs);
 		~Request();
 		Request &operator=(Request const &rhs);
-
-
 	};
 
 }

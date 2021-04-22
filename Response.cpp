@@ -42,7 +42,7 @@ string get_mime_type(const string& path)
 Response * Response::putFile(const string &path)
 {
 	try {
-		this->body(file_get_contents(path.substr(1)));
+		this->body(file_get_contents(path));
 		this->header("Content-Type", get_mime_type(path));
 	} catch (exception e) {
 		this->code(404);

@@ -17,6 +17,7 @@
 #include "Helper.hpp"
 #include <fcntl.h>
 #include "Response.hpp"
+#include "Request.hpp"
 #include "vector"
 
 #endif //WEBSERV_INCLUDES_HPP
