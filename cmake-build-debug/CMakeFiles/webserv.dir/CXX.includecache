@@ -6,27 +6,33 @@
 
 #IncludeRegexTransform: 
 
-/Users/hheimerd/CLionProjects/webserv/ENV.h
+/Users/hleilani/webserv/ENV.h
 string
 -
 
-/Users/hheimerd/CLionProjects/webserv/Helper.hpp
+/Users/hleilani/webserv/Helper.hpp
 includes.hpp
-/Users/hheimerd/CLionProjects/webserv/includes.hpp
+/Users/hleilani/webserv/includes.hpp
 
-/Users/hheimerd/CLionProjects/webserv/Request.cpp
+/Users/hleilani/webserv/Request.hpp
+includes.hpp
+/Users/hleilani/webserv/includes.hpp
+
+/Users/hleilani/webserv/Server.cpp
+Server.hpp
+/Users/hleilani/webserv/Server.hpp
+
+/Users/hleilani/webserv/Server.hpp
+includes.hpp
+/Users/hleilani/webserv/includes.hpp
 Request.hpp
-/Users/hheimerd/CLionProjects/webserv/Request.hpp
+/Users/hleilani/webserv/Request.hpp
 
-/Users/hheimerd/CLionProjects/webserv/Request.hpp
-includes.hpp
-/Users/hheimerd/CLionProjects/webserv/includes.hpp
-
-/Users/hheimerd/CLionProjects/webserv/includes.hpp
+/Users/hleilani/webserv/includes.hpp
 map
 -
 ENV.h
-/Users/hheimerd/CLionProjects/webserv/ENV.h
+/Users/hleilani/webserv/ENV.h
 string
 -
 iostream
@@ -42,7 +48,7 @@ netinet/in.h
 cstring
 -
 Helper.hpp
-/Users/hheimerd/CLionProjects/webserv/Helper.hpp
+/Users/hleilani/webserv/Helper.hpp
 vector
-/Users/hheimerd/CLionProjects/webserv/vector
+/Users/hleilani/webserv/vector
 

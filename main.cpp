@@ -1,18 +1,12 @@
-#include <iostream>
-#include "Response.hpp"
 #include "Server.hpp"
 
 int main()
 {
-	Server server(80);
-	server.startServer();
-
-//	Http::Response *response = new Http::Response;
-//	response
-//		->code(200)
-//		->header("Cookie", "test")
-//		->header("User-Agent", "Human")
-//		->body("tested");
-//	std::cout << response->toString();
-	return 0;
+    Config config;
+    config.port = 1500;
+    config.clientLimit = 5;
+    config.host = "127.0.0.1";
+    Server server1(config);
+    if (server1.Intialize())
+        server1.StartListening();
 }

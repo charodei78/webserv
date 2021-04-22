@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/hheimerd/CLionProjects/webserv/Helper.cpp" "/Users/hheimerd/CLionProjects/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Helper.cpp.o"
-  "/Users/hheimerd/CLionProjects/webserv/Request.cpp" "/Users/hheimerd/CLionProjects/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Request.cpp.o"
-  "/Users/hheimerd/CLionProjects/webserv/Response.cpp" "/Users/hheimerd/CLionProjects/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Response.cpp.o"
-  "/Users/hheimerd/CLionProjects/webserv/Server.cpp" "/Users/hheimerd/CLionProjects/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Server.cpp.o"
-  "/Users/hheimerd/CLionProjects/webserv/main.cpp" "/Users/hheimerd/CLionProjects/webserv/cmake-build-debug/CMakeFiles/webserv.dir/main.cpp.o"
+  "/Users/hleilani/webserv/Helper.cpp" "/Users/hleilani/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Helper.cpp.o"
+  "/Users/hleilani/webserv/Request.cpp" "/Users/hleilani/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Request.cpp.o"
+  "/Users/hleilani/webserv/Response.cpp" "/Users/hleilani/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Response.cpp.o"
+  "/Users/hleilani/webserv/Server.cpp" "/Users/hleilani/webserv/cmake-build-debug/CMakeFiles/webserv.dir/Server.cpp.o"
+  "/Users/hleilani/webserv/main.cpp" "/Users/hleilani/webserv/cmake-build-debug/CMakeFiles/webserv.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
