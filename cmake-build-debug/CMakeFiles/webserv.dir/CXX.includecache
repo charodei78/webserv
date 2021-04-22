@@ -13,12 +13,14 @@ string
 /Users/hheimerd/CLionProjects/webserv/Helper.hpp
 includes.hpp
 /Users/hheimerd/CLionProjects/webserv/includes.hpp
+fstream
+-
 
-/Users/hheimerd/CLionProjects/webserv/Request.cpp
-Request.hpp
-/Users/hheimerd/CLionProjects/webserv/Request.hpp
+/Users/hheimerd/CLionProjects/webserv/Response.cpp
+Response.hpp
+/Users/hheimerd/CLionProjects/webserv/Response.hpp
 
-/Users/hheimerd/CLionProjects/webserv/Request.hpp
+/Users/hheimerd/CLionProjects/webserv/Response.hpp
 includes.hpp
 /Users/hheimerd/CLionProjects/webserv/includes.hpp
 
@@ -43,6 +45,10 @@ cstring
 -
 Helper.hpp
 /Users/hheimerd/CLionProjects/webserv/Helper.hpp
+fcntl.h
+-
+Response.hpp
+/Users/hheimerd/CLionProjects/webserv/Response.hpp
 vector
 /Users/hheimerd/CLionProjects/webserv/vector
 

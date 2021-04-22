@@ -19,7 +19,8 @@ public:
 	~Server();
 	void startServer();
 	void closeServer();
-	void handle();
+
+	_Noreturn void handle();
 
 	Server &operator=(Server const &rhs);
 

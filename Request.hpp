@@ -19,11 +19,12 @@ namespace Http {
 
 	class Request
 	{
+		Request();
+	public:
+
 		query_s query_string;
 		string  body;
 		map<string, string> headers;
-		Request();
-	public:
 		Request(const string& body);
 		Request(Request const &rhs);
 		~Request();

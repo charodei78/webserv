@@ -17,8 +17,8 @@ namespace Http {
 		std::string 			response_body;
 		unsigned 				response_status_code;
 		string 					response_status_text;
-
 	public:
+
 		explicit Response(const string& http_version = "1.1");
 		Response(Response const& rhs);
 		~Response();
@@ -28,6 +28,8 @@ namespace Http {
 		Response *header(const string& name, const string& value);
 		Response *statusText(const string& name);
 		string   toString();
+
+		Response *putFile(const string &path);
 	};
 
 	string get_code_message(unsigned int code);

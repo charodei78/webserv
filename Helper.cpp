@@ -36,4 +36,12 @@ pair<string, string> split_pair(string needle, string str) {
 	return make_pair(header, body);
 }
 
-
+string file_get_contents(const string& path)
+{
+	std::ifstream t(path);
+	if (!t)
+		throw exception();
+	std::string str((std::istreambuf_iterator<char>(t)),
+                 std::istreambuf_iterator<char>());
+	return str;
+}

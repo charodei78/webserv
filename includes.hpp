@@ -15,6 +15,8 @@
 #include <netinet/in.h>
 #include <cstring>
 #include "Helper.hpp"
+#include <fcntl.h>
+#include "Response.hpp"
 #include "vector"
 
 #endif //WEBSERV_INCLUDES_HPP

@@ -23,13 +23,15 @@ void Server::startServer()
 	this->handle();
 };
 
-void Server::handle()
+_Noreturn void Server::handle()
 {
 	int         sock_c;
 	sockaddr_in addr_c;
 	int         addrlen;
+	int         result;
 	string      requestString;
 	Http::Request     *request;
+	Http::Response    *response;
 	unsigned    count;
 	char        buf[256];
 
@@ -42,15 +44,31 @@ void Server::handle()
 			requestString = "";
 			while ((count = read(sock_c, buf, 255)) > 0 && count < 256)
 			{
-				write(1, buf, count);
+//				write(1, buf, count);
 				requestString += buf;
 				if (count != 255)
 					break ;
 				bzero(buf, 256);
 			}
 			request = new Http::Request(requestString);
+			response = new Http::Response();
+			if (request->query_string.address == "/")
+			{
+				response
+					->body(file_get_contents("../Tests/image.html"))
+					->header("Content-Type", "text/html");
+			} else {
+				response->putFile(request->query_string.address);
+			}
+			  result = send(sock_c, response->toString().data(),
+			        response->toString().length(), 0);
+
+			    if (result == -1) {
+			        // произошла ошибка при отправле данных
+			        cerr << "send failed" << endl;
+			    }
+			    delete response;
 			close(sock_c);
-			break;
 		}
 		usleep(50);
 	}

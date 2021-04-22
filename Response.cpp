@@ -6,7 +6,7 @@
 
 using namespace Http;
 
-Response::Response(const string &http_version): response_status_code(502) /* server is broken */, http_version(http_version){}
+Response::Response(const string &http_version): response_status_code(200) /* server is broken */, http_version(http_version){}
 
 Response * Response::code(unsigned int code)
 {
@@ -17,6 +17,16 @@ Response * Response::code(unsigned int code)
 Response * Response::body(const string &body)
 {
 	this->response_body = body;
+	return this;
+}
+
+Response * Response::putFile(const string &path)
+{
+	try {
+		this->body(file_get_contents(path.substr(1)));
+	} catch (exception e) {
+		this->code(404);
+	}
 	return this;
 }
 
@@ -38,6 +48,20 @@ string Http::get_code_message(unsigned int code)
 	}
 	return "";
 }
+
+
+
+//string Http::get_mime_type(unsigned int code)
+//{
+//	int size = sizeof(Http::codes) / sizeof(int);
+//
+//	for (int i = 0; i < size; ++i)
+//	{
+//	if (Http::codes[i] == code)
+//	return Http::messages[i];
+//	}
+//	return "";
+//}
 
 
 Response *Response::statusText(const string& name)
