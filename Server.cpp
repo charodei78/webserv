@@ -50,24 +50,28 @@ _Noreturn void Server::handle()
 					break ;
 				bzero(buf, 256);
 			}
-			request = new Http::Request(requestString);
-			response = new Http::Response();
-			if (request->query_string.address == "/")
-			{
-				response
-					->body(file_get_contents("../Tests/image.html"))
-					->header("Content-Type", "text/html");
-			} else {
-				response->putFile(request->query_string.address);
-			}
-			  result = send(sock_c, response->toString().data(),
-			        response->toString().length(), 0);
+			try {
+				request = new Http::Request(requestString);
+				response = new Http::Response();
+				if (request->query_string.address == "/")
+				{
+					response
+						->body(file_get_contents("../Tests/image.html"))
+						->header("Content-Type", "text/html");
+				} else {
+					response->putFile(request->query_string.address);
+				}
+				result = send(sock_c, response->toString().data(),
+				      response->toString().length(), 0);
 
-			    if (result == -1) {
-			        // произошла ошибка при отправле данных
-			        cerr << "send failed" << endl;
-			    }
-			    delete response;
+				  if (result == -1) {
+				      // произошла ошибка при отправле данных
+				      cerr << "send failed" << endl;
+				  }
+				  delete response;
+			} catch (exception e) {
+				
+			}
 			close(sock_c);
 		}
 		usleep(50);

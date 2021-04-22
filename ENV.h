@@ -62,7 +62,7 @@ namespace Http {
 		"asx asf",
 		"mng"
 	};
-	static string content_types [46] = {
+	static string mime [46] = {
 	  "text/html",
 	  "text/css",
 	  "text/xml",

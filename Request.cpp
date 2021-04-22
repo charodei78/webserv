@@ -12,7 +12,7 @@ query_s parse_query(const string &str)
 	vector<string> parts = split(' ', str);
 
 	if (parts.size() != 3 || parts[0].empty() || parts[1].empty() || parts[2].empty())
-		throw;
+		throw exception();
 	res.method = parts[0];
 	res.address = parts[1];
 	res.protocol = parts[2].substr(5);
@@ -29,7 +29,7 @@ Request::Request(const string &request)
 	vector<string> structure = split('\n', message.first);
 
 	if (structure.size() < 2)
-		throw;
+		throw exception();
 	try {
 		this->query_string = parse_query(structure[0]);
 	} catch (exception e) {

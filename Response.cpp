@@ -20,10 +20,30 @@ Response * Response::body(const string &body)
 	return this;
 }
 
+string get_mime_type(const string& path)
+{
+	int size = sizeof(Http::codes) / sizeof(int);
+	size_t      last_entry;
+	string      ext;
+
+	last_entry = path.find_last_of('.');
+	if (last_entry == string::npos)
+		return "text/plain";
+	ext = path.substr(last_entry + 1);
+	for (int i = 0; i < size; ++i)
+	{
+		if (Http::files_ext[i] == ext)
+			return Http::mime[i];
+	}
+	return "text/plain";
+}
+
+
 Response * Response::putFile(const string &path)
 {
 	try {
 		this->body(file_get_contents(path.substr(1)));
+		this->header("Content-Type", get_mime_type(path));
 	} catch (exception e) {
 		this->code(404);
 	}
@@ -48,21 +68,6 @@ string Http::get_code_message(unsigned int code)
 	}
 	return "";
 }
-
-
-
-//string Http::get_mime_type(unsigned int code)
-//{
-//	int size = sizeof(Http::codes) / sizeof(int);
-//
-//	for (int i = 0; i < size; ++i)
-//	{
-//	if (Http::codes[i] == code)
-//	return Http::messages[i];
-//	}
-//	return "";
-//}
-
 
 Response *Response::statusText(const string& name)
 {
