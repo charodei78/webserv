@@ -7,12 +7,15 @@
 
 #include "includes.hpp"
 #include <fstream> // TODO: #include <fstream>
+#include <libc.h>
 
 using namespace std;
 
 vector<string> split(char c, string str);
 pair<string, string> split_pair(string needle, string str);
 string file_get_contents(const string& path);
+string getTimestamp();
+string getIP(unsigned long ip);
 
 
 #endif //WEBSERV_HELPER_HPP

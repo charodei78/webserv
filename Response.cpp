@@ -131,4 +131,19 @@ Response::Response(const Response &rhs)
 	operator=(rhs);
 }
 
+unsigned Response::code()
+{
+	return response_status_code;
+}
+
+const string &Response::body()
+{
+	return response_body;
+}
+
+const string &Response::header(const string &name)
+{
+	return headers[name];
+}
+
 

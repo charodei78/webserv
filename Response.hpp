@@ -22,12 +22,15 @@ namespace Http {
 		explicit Response(const string& http_version = "1.1");
 		Response(Response const& rhs);
 		~Response();
-		Response& operator=(Response const& rhs);
-		Response *code(unsigned code);
-		Response *body(const string& body);
-		Response *header(const string& name, const string& value);
-		Response *statusText(const string& name);
-		string   toString();
+		Response&       operator=(Response const& rhs);
+		Response        *code(unsigned code);
+		unsigned        code();
+		Response        *body(const string& body);
+		const string&   body();
+		Response        *header(const string& name, const string& value);
+		const string&   header(const string& name);
+		Response        *statusText(const string& name);
+		string          toString();
 
 		Response *putFile(const string &path);
 	};

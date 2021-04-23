@@ -1,35 +1,45 @@
 #include "Server.hpp"
 
-Server::Server(const Config config) : serverConfig(config) {}
+void Server::printLog(sockaddr_in client_addr, const string &message = "")
+{
+	cout << "[" << getTimestamp() << "] "
+	     << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
+	     << message << endl;
+}
 
-Server::Server(Server const &rhs) : serverConfig (rhs.serverConfig) {}
+Server::Server(const Config config) : serverConfig(config)
+{
+}
+
+Server::Server(Server const &rhs) : serverConfig(rhs.serverConfig)
+{
+}
 
 Server &Server::operator=(Server const &rhs)
 {
-    return *this;
+	return *this;
 }
 
 Server::~Server()
 {
-    if (socket_fd > 0)
-        close(socket_fd);
+	if (socket_fd > 0)
+		close(socket_fd);
 }
 
 bool Server::Intialize()
 {
-    sockaddr_in addr = sockaddr_in();
+	sockaddr_in addr = sockaddr_in();
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(serverConfig.port);
 	addr.sin_family = AF_INET;
 	socket_fd = socket(PF_INET, SOCK_STREAM, 0);
 
 	//Проверка удалось ли инициализировать сокет
-	if (socket_fd < 0 || bind(socket_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
-    {
+	if (socket_fd < 0 || bind(socket_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
 		std::cerr << strerror(errno);
-        return false;
-    }
-    return true;
+		return false;
+	}
+	return true;
 }
 
 //_Noreturn void Server::handle()
@@ -91,85 +101,90 @@ bool Server::Intialize()
 
 void Server::StartListening()
 {
-    if (listen(socket_fd, serverConfig.clientLimit) < 0)
-        return;
+	sockaddr_in client_addr;
 
+	if (listen(socket_fd, serverConfig.clientLimit) < 0)
+		return;
 
-    sockaddr_in client_addr;
-    int addrlen = sizeof(client_addr);
+	cout << "Starting server: http://" << serverConfig.host << ":" << serverConfig.port << endl;
 
-    for(;;)
-    {
-        int client_socket = accept(socket_fd, (struct sockaddr*)&client_addr, reinterpret_cast<socklen_t *>(&addrlen));
-        if (client_socket == 0)
-            continue;
-        else
-            if (client_socket < 0)
-            {
-                std::cerr << strerror(errno);
-                return;
-            }
-        ProcessConnection(client_addr, client_socket);
+	int addrlen = sizeof(client_addr);
 
-        close(client_socket);
-    }
+	for (;;) {
+		int client_socket = accept(socket_fd, (struct sockaddr *) &client_addr,
+		                           reinterpret_cast<socklen_t *>(&addrlen));
+		if (client_socket == 0)
+			continue;
+		else {
+			if (client_socket < 0) {
+				cerr << strerror(errno);
+				return;
+			}
+		}
+		printLog(client_addr, "Accepted");
+		ProcessConnection(client_addr, client_socket);
+
+		close(client_socket);
+		printLog(client_addr, "Closed");
+	}
 }
 
 void Server::ProcessConnection(const sockaddr_in &addr, const int sock)
 {
-    fd_set rfds;
-    timeval limitTime;
-    limitTime.tv_sec = 2;
-    limitTime.tv_usec = 0;
-    int         result;
-    Http::Request     *request;
-	Http::Response    *response;
-    
-    FD_ZERO(&rfds);
+	fd_set rfds;
+	timeval limitTime;
+	limitTime.tv_sec = 2;
+	limitTime.tv_usec = 0;
+	int result;
+	Http::Request *request;
+	Http::Response *response;
 
-    FD_SET(sock, &rfds);
+	FD_ZERO(&rfds);
 
-    int retval = select(sock + 1, &rfds, NULL, NULL, &limitTime);
+	FD_SET(sock, &rfds);
 
-    if (retval && FD_ISSET(sock, &rfds))
-    {
-        char buf[256];
-        bzero(buf, 256);
-        std::string requestString = "";
-        int count;
-        while ((count = read(sock, buf, 255)) > 0 && count < 256)
-        {
+	int retval = select(sock + 1, &rfds, NULL, NULL, &limitTime);
+
+	if (retval && FD_ISSET(sock, &rfds)) {
+		char buf[256];
+		bzero(buf, 256);
+		std::string requestString = "";
+		int count;
+		while ((count = read(sock, buf, 255)) > 0 && count < 256) {
 			requestString += buf;
 			if (count != 255)
-				break ;
+				break;
 			bzero(buf, 256);
-        }
-        try {
-        	request = new Http::Request(requestString);
-        	response = new Http::Response();
-        	if (request->query_string.address == "/")
-        	{
-        		response
-	                ->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
-	                ->header("Content-Type", "text/html");
-        	} else {
-        		response->putFile(this->serverConfig.root_directory + request->query_string.address);
-        	}
-        	result = send(sock, response->toString().data(),response->toString().length(), 0);
-        	if (result == -1) {
-        		// sending failed
-        		cerr << "send failed" << endl;
-        	}
-        	delete response;
-        } catch (exception e) {
-        	// query string is incorrect
-        }
-    }
-    else
-        return;
+		}
+		try {
+			request = new Http::Request(requestString);
+			response = new Http::Response();
+			if (request->query_string.address == "/") {
+				response
+						->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
+						->header("Content-Type", "text/html");
+			} else {
+				response->putFile(this->serverConfig.root_directory + request->query_string.address);
+			}
+			result = send(sock, response->toString().data(), response->toString().length(), 0);
+			if (result == -1) {
+				// sending failed
+				cerr << "send failed" << endl;
+			}
+
+			printLog(addr, "[" + to_string(response->code()) + "]: "
+			               + request->query_string.method + " " + request->query_string.address);
+
+			delete response;
+
+		} catch (exception e) {
+			// query string is incorrect
+		}
+	} else
+		return;
 }
 
 bool Server::SendHttpResponse(const Http::Response)
 {
-    return true;
+	return true;
 }

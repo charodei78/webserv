@@ -25,6 +25,8 @@ public:
         void StartListening();
         bool SendHttpResponse(const Http::Response);
         void ProcessConnection(const sockaddr_in &addr, const int sock);
+
+	static void printLog(sockaddr_in client_addr, const string& message);
 };
 
 #endif

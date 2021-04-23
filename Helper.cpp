@@ -45,3 +45,28 @@ string file_get_contents(const string& path)
                  std::istreambuf_iterator<char>());
 	return str;
 }
+
+string getTimestamp()
+{
+	char        buffer[256] = "";
+	tm          *time;
+	timeval     timeval = {};
+
+	gettimeofday(&timeval, nullptr);
+	time = localtime(&timeval.tv_sec);
+	mktime(time);
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", time);
+	return string(buffer);
+}
+
+string getIP(unsigned long ip)
+{
+	string result = "";
+
+//	cout << (ip & 0xFF000000);
+	result += to_string(ip & 0xFF) + '.';
+	result += to_string(ip >> 8 & 0xFF) + '.';
+	result += to_string(ip >> 16 & 0xFF) + '.';
+	result += to_string(ip >> 24 & 0xFF);
+	return result;
+}
