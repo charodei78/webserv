@@ -127,6 +127,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, std::stri
 	std::string message;
 	Http::Request *request;
 	Http::Response *response;
+	CGIRequest  *cgiRequest;
 
 	try 
 	{
@@ -138,10 +139,10 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, std::stri
 					->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
 					->header("Content-Type", "text/html");
 		}
-//			else if (request->query.address.find("php")) {
-//
-//			}
-		else {
+		else if (request->query.address.find("php") != string::npos) {
+			cgiRequest = new CGIRequest(*request, serverConfig, addr);
+			cgiRequest->makeQuery();
+		} else {
 			response->putFile(this->serverConfig.root_directory + request->query.address);
 		}
 		result = send(sock, response->toString().data(), response->toString().length(), 0);

@@ -57,6 +57,10 @@ Request::~Request()
 Request &Request::operator=(Request const &rhs)
 {
 	if (this != &rhs) {
+		query = rhs.query;
+		body = rhs.body;
+		headers = rhs.headers;
+		from = rhs.from;
 	}
 	return *this;
 };

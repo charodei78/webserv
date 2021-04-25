@@ -12,6 +12,7 @@ class Config
         Config &operator=(Config const &);
         std::string domain;
         std::string ip;
+        std::string cgi_path;
         std::string protocol;
         int port;
         int clientLimit; 

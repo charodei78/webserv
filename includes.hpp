@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <ctime>
+#include <vector>
 #include <cerrno>
 #include <netinet/in.h>
 #include <cstring>
@@ -20,6 +21,6 @@
 #include "Response.hpp"
 #include "Request.hpp"
 #include "Config.hpp"
-#include "vector"
+#include "CGIRequest.hpp"
 
 #endif //WEBSERV_INCLUDES_HPP

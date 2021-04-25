@@ -6,17 +6,24 @@
 #define WEBSERV_CGIREQUEST_HPP
 
 #include "includes.hpp"
+#include "Request.hpp"
 using namespace std;
+
+namespace Http {
+	class Request;
+}
 
 class CGIRequest
 {
 	CGIRequest();
 	CGIRequest(CGIRequest const &rhs);
 
-	map<string, string> _env;
+//	map<string, string> _env;
+	vector<string>      _env;
+	string              _cgi_path;
 
 public:
-//	string makeQuery();
+	string makeQuery();
 	CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr);
 	~CGIRequest();
 
