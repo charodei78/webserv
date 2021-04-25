@@ -27,7 +27,8 @@ int main()
     Config config;
     config.port = 80;
     config.clientLimit = 5;
-    config.host = "127.0.0.1";
+    config.ip = "127.0.0.1";
+    config.domain = "localhost";
     config.root_directory = "../public";
     Server server1(config);
     if (server1.Intialize())

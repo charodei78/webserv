@@ -14,6 +14,7 @@ namespace Http {
 	struct query_s {
 		string method;
 		string address;
+		string query_string;
 		string protocol;
 	};
 
@@ -21,9 +22,10 @@ namespace Http {
 	{
 		Request();
 	public:
-		query_s query_string;
+		query_s query;
 		string  body;
 		map<string, string> headers;
+		int     from;
 
 		Request(const string& body);
 		Request(Request const &rhs);

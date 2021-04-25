@@ -10,7 +10,9 @@ class Config
         Config();
         ~Config();
         Config &operator=(Config const &);
-        std::string host;
+        std::string domain;
+        std::string ip;
+        std::string protocol;
         int port;
         int clientLimit; 
         std::string root_directory;

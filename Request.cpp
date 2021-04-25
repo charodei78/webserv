@@ -8,14 +8,18 @@ using namespace Http;
 
 query_s parse_query(const string &str)
 {
-	query_s res;
-	vector<string> parts = split(' ', str);
+	query_s             res;
+	vector<string>      parts = split(' ', str);
+	pair<string,string> query;
 
 	if (parts.size() != 3 || parts[0].empty() || parts[1].empty() || parts[2].empty())
 		throw exception();
-	res.method = parts[0];
-	res.address = parts[1];
+	res.method = trim(parts[0]);
+	query = split_pair("?" ,trim(parts[1]));
+	res.address = query.first;
+	res.query_string = query.second;
 	res.protocol = parts[2].substr(5);
+	res.protocol = trim(res.protocol);
 	return res;
 }
 
@@ -31,7 +35,7 @@ Request::Request(const string &request)
 	if (structure.size() < 2)
 		throw exception();
 	try {
-		this->query_string = parse_query(structure[0]);
+		this->query = parse_query(structure[0]);
 	} catch (exception e) {
 		// TODO: catch query string
 	}

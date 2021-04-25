@@ -42,60 +42,6 @@ bool Server::Intialize()
 	return true;
 }
 
-//_Noreturn void Server::handle()
-//{
-//	int         sock_c;
-//	sockaddr_in addr_c;
-//	int         addrlen;
-//	int         result;
-//	string      requestString;
-//	Http::Request     *request;
-//	Http::Response    *response;
-//	unsigned    count;
-//	char        buf[256];
-//
-//	while (1)
-//	{
-//		addrlen = sizeof addr_c;
-//		if ((sock_c = accept(this->socket_fd, (struct sockaddr*)&addr_c, reinterpret_cast<socklen_t *>(&addrlen))) != 0)
-//		{
-//			bzero(buf, 256);
-//			requestString = "";
-//			while ((count = read(sock_c, buf, 255)) > 0 && count < 256)
-//			{
-////				write(1, buf, count);
-//				requestString += buf;
-//				if (count != 255)
-//					break ;
-//				bzero(buf, 256);
-//			}
-//			try {
-//				request = new Http::Request(requestString);
-//				response = new Http::Response();
-//				if (request->query_string.address == "/")
-//				{
-//					response
-//						->body(file_get_contents("../public/image.html"))
-//						->header("Content-Type", "text/html");
-//				} else {
-//					response->putFile(request->query_string.address);
-//				}
-//				result = send(sock_c, response->toString().data(),
-//				      response->toString().length(), 0);
-//
-//				  if (result == -1) {
-//				      // произошла ошибка при отправле данных
-//				      cerr << "send failed" << endl;
-//				  }
-//				  delete response;
-//			} catch (exception e) {
-//
-//			}
-//			close(sock_c);
-//		}
-//		usleep(50);
-//	}
-//};
 
 //void Server::closeServer();
 
@@ -106,7 +52,7 @@ void Server::StartListening()
 	if (listen(socket_fd, serverConfig.clientLimit) < 0)
 		return;
 
-	cout << "Starting server: http://" << serverConfig.host << ":" << serverConfig.port << endl;
+	cout << "Starting server: http://" << serverConfig.domain << ":" << serverConfig.port << endl;
 
 	int addrlen = sizeof(client_addr);
 
@@ -136,6 +82,7 @@ void Server::ProcessConnection(const sockaddr_in &addr, const int sock)
 	limitTime.tv_sec = 2;
 	limitTime.tv_usec = 0;
 	int result;
+	string message;
 	Http::Request *request;
 	Http::Response *response;
 
@@ -159,21 +106,27 @@ void Server::ProcessConnection(const sockaddr_in &addr, const int sock)
 		try {
 			request = new Http::Request(requestString);
 			response = new Http::Response();
-			if (request->query_string.address == "/") {
+			if (request->query.address == "/") {
 				response
 						->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
 						->header("Content-Type", "text/html");
-			} else {
-				response->putFile(this->serverConfig.root_directory + request->query_string.address);
+			}
+//			else if (request->query.address.find("php")) {
+//
+//			}
+			else {
+				response->putFile(this->serverConfig.root_directory + request->query.address);
 			}
 			result = send(sock, response->toString().data(), response->toString().length(), 0);
 			if (result == -1) {
 				// sending failed
 				cerr << "send failed" << endl;
 			}
-
-			printLog(addr, "[" + to_string(response->code()) + "]: "
-			               + request->query_string.method + " " + request->query_string.address);
+			message = "[" + to_string(response->code()) + "]: "
+			               + request->query.method + " " + request->query.address;
+			if (!request->query.query_string.empty())
+				message += "?" + request->query.query_string;
+			printLog(addr,  message);
 
 			delete response;
 
