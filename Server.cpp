@@ -20,6 +20,16 @@ Server &Server::operator=(Server const &rhs)
 	return *this;
 }
 
+std::string Server::GetServerName()
+{
+	return serverName;
+}
+
+bool Server::operator==(Server server)
+{
+	return serverName == server.serverName;
+}
+
 Server::~Server()
 {
 	if (socket_fd > 0)
@@ -92,52 +102,65 @@ void Server::ProcessConnection(const sockaddr_in &addr, const int sock)
 
 	int retval = select(sock + 1, &rfds, NULL, NULL, &limitTime);
 
-	if (retval && FD_ISSET(sock, &rfds)) {
+	if (retval && FD_ISSET(sock, &rfds)) 
+	{
 		char buf[256];
 		bzero(buf, 256);
 		std::string requestString = "";
 		int count;
-		while ((count = read(sock, buf, 255)) > 0 && count < 256) {
+		while ((count = read(sock, buf, 255)) > 0 && count < 256) 
+		{
 			requestString += buf;
 			if (count != 255)
 				break;
 			bzero(buf, 256);
 		}
-		try {
-			request = new Http::Request(requestString);
-			response = new Http::Response();
-			if (request->query.address == "/") {
-				response
-						->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
-						->header("Content-Type", "text/html");
-			}
-//			else if (request->query.address.find("php")) {
-//
-//			}
-			else {
-				response->putFile(this->serverConfig.root_directory + request->query.address);
-			}
-			result = send(sock, response->toString().data(), response->toString().length(), 0);
-			if (result == -1) {
-				// sending failed
-				cerr << "send failed" << endl;
-			}
-			message = "[" + to_string(response->code()) + "]: "
-			               + request->query.method + " " + request->query.address;
-			if (!request->query.query_string.empty())
-				message += "?" + request->query.query_string;
-			printLog(addr,  message);
-
-			delete response;
-
-		} catch (exception e) {
-			// query string is incorrect
-		}
-	} else
+		SendHttpResponse(addr, sock, requestString);
+	}
+	else
 		return;
 }
 
-bool Server::SendHttpResponse(const Http::Response)
+bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, std::string requestString)
 {
+	int result;
+	std::string message;
+	Http::Request *request;
+	Http::Response *response;
+
+	try 
+	{
+		request = new Http::Request(requestString);
+		response = new Http::Response();
+		if (request->query.address == "/") 
+		{
+			response
+					->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
+					->header("Content-Type", "text/html");
+		}
+//			else if (request->query.address.find("php")) {
+//
+//			}
+		else {
+			response->putFile(this->serverConfig.root_directory + request->query.address);
+		}
+		result = send(sock, response->toString().data(), response->toString().length(), 0);
+		if (result == -1) {
+			// sending failed
+			cerr << "send failed" << endl;
+		}
+		message = "[" + to_string(response->code()) + "]: "
+						+ request->query.method + " " + request->query.address;
+		if (!request->query.query_string.empty())
+			message += "?" + request->query.query_string;
+		printLog(addr,  message);
+
+		delete response;
+
+	} catch (exception e) {
+		// query string is incorrect
+		printLog(addr,  strerror(errno));
+		return false;
+	}
 	return true;
 }

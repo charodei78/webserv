@@ -6,27 +6,27 @@
 
 class Server
 {
-private:
-	int socket_fd;
-	const Config serverConfig;
-    Server();
+    private:
+        int socket_fd;
+        std::string serverName;
+        const Config serverConfig;
+        Server();
 
-public:
-    Server(const Config server_config);
-    Server(Server const &rhs);
-    Server &operator=(Server const &rhs);
-    ~Server();
-	void startServer();
-	void closeServer();
-
-	_Noreturn void handle();
-
+    public:
+        Server(const Config server_config);
+        Server(Server const &rhs);
+        Server &operator=(Server const &rhs);
+        bool operator==(Server);
+        ~Server();
+        std::string GetServerName();
+        void startServer();
+        void closeServer();
+        void handle();
         bool Intialize();
         void StartListening();
-        bool SendHttpResponse(const Http::Response);
+        bool SendHttpResponse(const sockaddr_in &addr, const int sock, std::string requestString);
         void ProcessConnection(const sockaddr_in &addr, const int sock);
-
-	static void printLog(sockaddr_in client_addr, const string& message);
+        static void printLog(sockaddr_in client_addr, const string& message);
 };
 
 #endif
