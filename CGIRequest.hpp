@@ -16,7 +16,7 @@ class CGIRequest
 	map<string, string> _env;
 
 public:
-
+//	string makeQuery();
 	CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr);
 	~CGIRequest();
 

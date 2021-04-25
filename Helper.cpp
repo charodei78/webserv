@@ -90,5 +90,29 @@ std::string& trim(std::string& str, const std::string& chars)
 
 
 string  abs_path(string path) {
-	return path; // TODO: make absolute path function
+	string  result;
+	char    buf[512] = {};
+
+	if (path[0] == '/')
+		return path;
+	getcwd(buf, sizeof(buf));
+	result = buf;
+
+	while (1) {
+		if (path.find("../") == 0) {
+			result = result.substr(0, result.find_last_of('/'));
+			path = path.substr(3);
+		}
+		else if (path.find("./") == 0) {
+			path = path.substr(2);
+			continue ;
+		}
+		else
+		{
+			if (path[0] == '/')
+				return result + path;
+			else
+				return result += "/" + path;
+		}
+	}
 }
