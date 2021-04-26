@@ -22,11 +22,7 @@ class Server
         std::string GetServerName();
         void startServer();
         void closeServer();
-        void handle();
-        bool Intialize();
-        void StartListening();
-        bool SendHttpResponse(const sockaddr_in &addr, const int sock, std::string requestString);
-        void ProcessConnection(const sockaddr_in &addr, const int sock);
+        bool SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request);
         static void printLog(sockaddr_in client_addr, const string& message);
 };
 
