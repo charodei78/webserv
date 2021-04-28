@@ -48,12 +48,11 @@ void ServerListener::StartListen()
 		                           reinterpret_cast<socklen_t *>(&addrlen));
 		if (client_socket == 0)
 			continue;
-		else {
-			if (client_socket < 0) {
-				cerr << strerror(errno);
-				return;
-			}
+		else if (client_socket < 0) {
+			cerr << strerror(errno);
+			return;
 		}
+
 
 		printLog(client_addr, "connected");
 		try

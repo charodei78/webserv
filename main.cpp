@@ -13,14 +13,14 @@ int main()
     config.clientLimit = 5;
     config.ip = "127.0.0.1";
     config.domain = "localhost";
-    config.cgi_path = "../cgi/cgi_tester";
-    config.root_directory = "./public";
+    config.cgi_path = "/usr/bin/php";
+    config.root_directory = "../public";
 
     Config newTestConfig = config;
     newTestConfig.domain = "test.localhost";
     newTestConfig.root_directory = "./test.public";
 
-    ServerListener listener(80);
+    ServerListener listener(60);
     
     Server server1(config);
     Server server2(newTestConfig);
@@ -31,5 +31,5 @@ int main()
     if (listener.Intialize())
         listener.StartListen();
     else
-        std::cout << "intialize err";
+        std::cout << " initialize err";
 }
