@@ -106,8 +106,8 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	_env.push_back("SERVER_ADDR=" + config.ip);
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_env.push_back("SERVER_SOFTWARE=C++98");
-	_env.push_back("SCRIPT_NAME=" + abs_path(config.root_directory + request.query.address));
-	_env.push_back("SCRIPT_FILENAME=" + request.query.address);
+	_env.push_back("SCRIPT_NAME=" + request.query.address);
+	_env.push_back("SCRIPT_FILENAME=" + abs_path(config.root_directory + request.query.address));
 	_env.push_back("PATH_INFO=" + abs_path(config.root_directory + request.query.address));
 	//	_env["PATH_TRANSLATED"] =
 
@@ -128,16 +128,47 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	_env.push_back("HTTP_CONNECTION=" + request.headers["Connection"]); // TODO: Keep-Alive
 	_env.push_back("HTTP_REFERER=" + request.headers["Referer"]);
 	_env.push_back("HTTP_X_FORWARDED_FOR=" + request.headers["X-Forwarded-For"]);
-
+	_env.push_back("");
 }
 
-string CGIRequest::makeQuery()
+void CGIRequest::makeQuery()
 {
-	char    *args[1];
-	char    program[256] = {};
+	char            *args[2];
+	char            *env[_env.size()];
+	string          program;
+	int             status;
+	pid_t           pid;
+	int             pipes[2];
+	char            buf[256] = {};
 
-	strcpy(program, _cgi_path.substr(_cgi_path.find_last_of('/')).c_str());
-	args[0] = program;
-	execve(_cgi_path.c_str(), args, reinterpret_cast<char *const *>(&_env[0]));
-	return std::string();
+	args[1] = nullptr;
+	for (int i = 0; i < _env.size(); ++i) {
+		env[i] = (char*)_env[i].c_str();
+	}
+	env[_env.size()] = nullptr;
+	program = _cgi_path.substr(_cgi_path.find_last_of('/'));
+	args[0] = (char*)program.c_str();
+	pipe(pipes);
+	pid = fork();
+	if (pid == -1) {
+		std::cout << "fork: " << strerror(errno) << std::endl;
+		return;
+	}
+	if (pid == 0) {
+		dup2(pipes[1], 0);
+		dup2(pipes[0], 1);
+		close(0);
+		close(1);
+
+		if (execve(_cgi_path.c_str(), args, env) == -1) {
+			std::cout << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
+		}
+	} else {
+		close(pipes[1]);
+		close(pipes[0]);
+		waitpid(pid, &status, 0);
+		while (read(pipes[0], buf, 255) > 0) {
+			std::cout << buf;
+		}
+	}
 };

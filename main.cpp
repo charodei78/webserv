@@ -4,6 +4,7 @@
 #include "Response.hpp"
 #include "Helper.hpp"
 #include "Server.hpp"
+#include "ServerListener.hpp"
 
 int main()
 {
@@ -12,9 +13,23 @@ int main()
     config.clientLimit = 5;
     config.ip = "127.0.0.1";
     config.domain = "localhost";
-    config.cgi_path = "../cgi/cgi_tester";
+    config.cgi_path = "/usr/bin/php";
     config.root_directory = "../public";
+
+    Config newTestConfig = config;
+    newTestConfig.domain = "test.localhost";
+    newTestConfig.root_directory = "./test.public";
+
+    ServerListener listener(60);
+    
     Server server1(config);
-    if (server1.Intialize())
-        server1.StartListening();
+    Server server2(newTestConfig);
+
+    listener.BindServer(server1);
+    listener.BindServer(server2);
+
+    if (listener.Intialize())
+        listener.StartListen();
+    else
+        std::cout << " initialize err";
 }
