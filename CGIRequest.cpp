@@ -155,20 +155,20 @@ void CGIRequest::makeQuery()
 		return;
 	}
 	if (pid == 0) {
-		dup2(pipes[1], 0);
-		dup2(pipes[0], 1);
-		close(0);
-		close(1);
+//		dup2(pipes[1], 0);
+		dup2(pipes[1], 1);
+		close(pipes[0]);
+		close(pipes[1]);
 
 		if (execve(_cgi_path.c_str(), args, env) == -1) {
 			std::cout << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
 		}
 	} else {
 		close(pipes[1]);
-		close(pipes[0]);
 		waitpid(pid, &status, 0);
-		while (read(pipes[0], buf, 255) > 0) {
+		while (read(pipes[0], buf, 255)) {
 			std::cout << buf;
 		}
+		close(pipes[0]);
 	}
 };
