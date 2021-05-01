@@ -4,10 +4,12 @@
 #include "Response.hpp"
 #include "Helper.hpp"
 #include "Server.hpp"
+#include "ConfigParser.hpp"
 #include "ServerListener.hpp"
 
 int main()
 {
+    /*
     Config config;
     config.port = 80;
     config.clientLimit = 5;
@@ -32,4 +34,11 @@ int main()
         listener.StartListen();
     else
         std::cout << " initialize err";
+    */
+
+    ConfigParser parser;
+
+    list<Config> testConfigs = parser.GetServerConfigs("../test.conf");
+
+    std::cout << testConfigs.size();
 }

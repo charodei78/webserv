@@ -2,8 +2,8 @@
 // Created by Holli Heimerdinger on 4/18/21.
 //
 
-#ifndef WEBSERV_RESPONSE_HPP
-#define WEBSERV_RESPONSE_HPP
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 
 #include "includes.hpp"
 

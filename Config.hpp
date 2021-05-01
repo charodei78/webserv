@@ -3,6 +3,8 @@
 
 #include <string>
 #include <map>
+#include "Location.hpp"
+#include <vector>
 
 class Config
 {
@@ -18,6 +20,7 @@ class Config
         int clientLimit; 
         std::string root_directory;
         std::map<std::string, std::string> metaVariables;
+        std::vector<Location> locations;
 };
 
 #endif

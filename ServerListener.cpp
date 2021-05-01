@@ -26,10 +26,11 @@ bool ServerListener::Intialize()
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
 	//Проверка удалось ли инициализировать сокет
-	if (sock < 0 || bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+	if (sock < 0) {
 		std::cerr << strerror(errno);
 		return false;
 	}
+    bind(sock, (struct sockaddr *) &addr, sizeof(addr));
 	std::cout << "Listener with " << port << " started\n";
 	return true;
 }

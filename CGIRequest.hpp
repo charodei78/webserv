@@ -2,8 +2,8 @@
 // Created by Holli Heimerdinger on 4/25/21.
 //
 
-#ifndef WEBSERV_CGIREQUEST_HPP
-#define WEBSERV_CGIREQUEST_HPP
+#ifndef CGIREQUEST_HPP
+#define CGIREQUEST_HPP
 
 #include "includes.hpp"
 #include "Request.hpp"

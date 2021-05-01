@@ -2,8 +2,8 @@
 // Created by Holli Heimerdinger on 4/20/21.
 //
 
-#ifndef WEBSERV_REQUEST_HPP
-#define WEBSERV_REQUEST_HPP
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
 #include "includes.hpp"
 

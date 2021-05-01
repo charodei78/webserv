@@ -21,6 +21,16 @@ vector<string> split(char c, string str) {
 	return result;
 };
 
+bool isContain(string str, int(*predicate)(int))
+{
+    return find_if(str.begin(), str.end(), predicate) != str.end();
+}
+
+int isEmptySpace(int c) 
+{ 
+	return c == ' ' || c == '\n' || c == '\t' || c == '\r';
+}
+
 pair<string, string> split_pair(string needle, string str) {
 	size_t index;
 	string header;
@@ -38,12 +48,19 @@ pair<string, string> split_pair(string needle, string str) {
 
 string file_get_contents(const string& path)
 {
-	std::ifstream t(path);
-	if (!t)
-		throw exception();
-	std::string str((std::istreambuf_iterator<char>(t)),
-                 std::istreambuf_iterator<char>());
-	return str;
+    int configFD = open(path.c_str(), O_RDONLY);
+
+    struct stat buff;
+    stat(path.c_str(), &buff);
+    int fileSize = buff.st_size;
+
+    char fileBuff[fileSize + 1];
+
+    read(configFD, &fileBuff, fileSize);
+
+    fileBuff[fileSize] = 0;
+
+    return string(fileBuff);
 }
 
 string getTimestamp()
@@ -69,6 +86,11 @@ string getIP(unsigned long ip)
 	result += to_string(ip >> 16 & 0xFF) + '.';
 	result += to_string(ip >> 24 & 0xFF);
 	return result;
+}
+
+int IsEmptySpace(int c)
+{
+    return c == ' ' || c == '\n' || c == '\t' || c == '\r';
 }
 
 std::string& ltrim(std::string& str, const std::string& chars)

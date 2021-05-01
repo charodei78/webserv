@@ -2,8 +2,8 @@
 // Created by Holli Heimerdinger on 4/20/21.
 //
 
-#ifndef WEBSERV_HELPER_HPP
-#define WEBSERV_HELPER_HPP
+#ifndef HELPER_HPP
+#define HELPER_HPP
 
 #include "includes.hpp"
 #include <fstream> // TODO: #include <fstream>
@@ -22,6 +22,8 @@ string getIP(unsigned long ip);
 string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
 string& rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
 string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
+int isEmptySpace(int c);
+bool isContain(string str, int(*predicate)(int));
 
 string  abs_path(string path);
 
