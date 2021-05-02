@@ -27,11 +27,11 @@ bool ServerListener::Intialize()
 
 	//Проверка удалось ли инициализировать сокет
 	if (sock < 0) {
-		std::cerr << strerror(errno);
+		cerr << strerror(errno);
 		return false;
 	}
     bind(sock, (struct sockaddr *) &addr, sizeof(addr));
-	std::cout << "Listener with " << port << " started\n";
+	cout << "Listener with " << port << " started\n";
 	return true;
 }
 
@@ -60,7 +60,7 @@ void ServerListener::StartListen()
 		{
 			ProcessConnectionToServer(client_addr, client_socket);
 		}
-		catch (std::exception)
+		catch (exception)
 		{
 			cerr << strerror(errno);
 		}
@@ -88,7 +88,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 
 	int retval = select(client_socket + 1, &rfds, NULL, NULL, &limitTime);
 
-	std::string requestString = "";
+	string requestString = "";
 	if (retval && FD_ISSET(client_socket, &rfds)) 
 	{
 		char buf[256];
@@ -107,23 +107,23 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 
 	request = new Http::Request(requestString);
 
-	std::string host = request->headers["Host"];
+	string host = request->headers["Host"];
 
     Server requiredServer = FindServerByHost(host);
     requiredServer.SendHttpResponse(client_addr, client_socket, request);
 }
 
-std::string tempHost;
+string tempHost;
 bool IsServerNameEqualHost(Server server)
 {
 	tempHost.erase(tempHost.find_last_not_of(" \n\r\t")+1);
     return server.GetServerName() == tempHost;
 }
 
-Server &ServerListener::FindServerByHost(std::string host)
+Server &ServerListener::FindServerByHost(string host)
 {
 	tempHost = host;
-	std::list<Server>::iterator serverIterator = std::find_if(servers.begin(), servers.end(), IsServerNameEqualHost);
+	list<Server>::iterator serverIterator = find_if(servers.begin(), servers.end(), IsServerNameEqualHost);
     if (serverIterator == servers.end())
 	{
 		return *servers.begin();
@@ -137,7 +137,7 @@ Server &ServerListener::FindServerByHost(std::string host)
 //TODO: Обработать их тут, сразу задав в них сокеты этого сервера, чтоб сразу можно было использовать их в тех классах
 bool ServerListener::BindServer(Server& server)
 {
-    if (std::find(servers.begin(), servers.end(), server) == servers.end())
+    if (find(servers.begin(), servers.end(), server) == servers.end())
     {
         servers.push_back(server);
         return true;

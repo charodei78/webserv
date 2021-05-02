@@ -19,9 +19,9 @@ string file_get_contents(const string& path);
 string getTimestamp();
 string getIP(unsigned long ip);
 
-string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
-string& rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
-string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
+string& ltrim(string& str, const string& chars = "\t\n\v\f\r ");
+string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
+string& trim(string& str, const string& chars = "\t\n\v\f\r ");
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
 

@@ -22,7 +22,7 @@ Server &Server::operator=(Server const &rhs)
 	return *this;
 }
 
-std::string Server::GetServerName()
+string Server::GetServerName()
 {
 	return serverName;
 }
@@ -41,7 +41,7 @@ Server::~Server()
 bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request)
 {
 	int result;
-	std::string message;
+	string message;
 	Http::Response *response;
 	CGIRequest  *cgiRequest;
 

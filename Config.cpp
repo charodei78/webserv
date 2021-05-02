@@ -2,7 +2,6 @@
 
 Config::Config() 
 {
-    port = 80;
     protocol = "http";
     domain = "localhost";
     ip = "127.0.0.1";
@@ -11,6 +10,13 @@ Config::Config()
 }
 
 Config::~Config(){}
+
+void Config::ParseMetaVariables()
+{
+    map<string, string> unusedOptions(metaVariables);
+
+
+}
 
 Config &Config::operator=(Config const &config)
 {

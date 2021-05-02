@@ -6,21 +6,29 @@
 #include "Location.hpp"
 #include <vector>
 
+using namespace std;
+
+static string valibleMetaVariables[10] = {
+        "index",
+        "error_page",
+        "client_max_body_size"};
+
 class Config
 {
     public:
         Config();
         ~Config();
         Config &operator=(Config const &);
-        std::string domain;
-        std::string ip;
-        std::string cgi_path;
-        std::string protocol;
+        string domain;
+        string ip;
+        string cgi_path;
+        string protocol;
         int port;
         int clientLimit; 
-        std::string root_directory;
-        std::map<std::string, std::string> metaVariables;
-        std::vector<Location> locations;
+        string root_directory;
+        map<string, string> metaVariables;
+        vector<Location> locations;
+        void ParseMetaVariables();
 };
 
 #endif

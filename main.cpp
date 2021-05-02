@@ -9,14 +9,14 @@
 
 int main()
 {
-    /*
+    
     Config config;
     config.port = 80;
     config.clientLimit = 5;
     config.ip = "127.0.0.1";
     config.domain = "localhost";
-    config.cgi_path = "../cgi/cgi_tester";
-    config.root_directory = "../public";
+    config.cgi_path = "./cgi/cgi_tester";
+    config.root_directory = "./public";
 
     Config newTestConfig = config;
     newTestConfig.domain = "test.localhost";
@@ -34,11 +34,11 @@ int main()
         listener.StartListen();
     else
         std::cout << " initialize err";
-    */
+    
 
-    ConfigParser parser;
+    // ConfigParser parser;
 
-    list<Config> testConfigs = parser.GetServerConfigs("../test.conf");
+    // list<Config> testConfigs = parser.GetServerConfigs("./test.conf");
 
-    std::cout << testConfigs.size();
+    // std::cout << testConfigs.size();
 }

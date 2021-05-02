@@ -8,12 +8,14 @@
 #include <map>
 #include <string>
 
+using namespace std;
+
 class Location
 {
 public:
-    const std::string path;
-    std::map<std::string, std::string> metaVariables;
-    Location(std::string path);
+    const string path;
+    map<string, string> metaVariables;
+    Location(string path);
     ~Location();
 };
 

@@ -5,6 +5,8 @@
 #include "Response.hpp"
 #include "includes.hpp"
 
+using namespace std;
+
 class Server
 {
     private:
