@@ -51,14 +51,14 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		if (request->query.address == "/") 
 		{
 			response
-					->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
+					->body(file_get_contents(this->serverConfig.rootDirectory + "/image.html"))
 					->header("Content-Type", "text/html");
 		}
 		else if (request->query.address.find("php") != string::npos) {
 			cgiRequest = new CGIRequest(*request, serverConfig, addr);
 			cgiRequest->makeQuery();
 		} else {
-			response->putFile(this->serverConfig.root_directory + request->query.address);
+			response->putFile(this->serverConfig.rootDirectory + request->query.address);
 		}
 		result = send(sock, response->toString().data(), response->toString().length(), 0);
 		if (result == -1) {

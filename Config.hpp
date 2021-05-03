@@ -5,6 +5,7 @@
 #include <map>
 #include "Location.hpp"
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -21,14 +22,19 @@ class Config
         Config &operator=(Config const &);
         string domain;
         string ip;
-        string cgi_path;
-        string protocol;
+        string cgiPath;
+        string index;
+        string errorPage;
+        string allowedFunctions; //example: GET/POST , POST/GET, GET, POST
         int port;
-        int clientLimit; 
-        string root_directory;
+        int limitClientBodySize;
+        string rootDirectory;
         map<string, string> metaVariables;
         vector<Location> locations;
         void ParseMetaVariables();
+    private:
+        bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, string &fieldRef);
+        bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, int &fieldRef);
 };
 
 #endif

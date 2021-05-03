@@ -67,7 +67,7 @@ CGIRequest &CGIRequest::operator=(CGIRequest const &rhs)
 //	_env["SERVER_ADDR"] = config.ip;
 //	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 //	_env["SERVER_SOFTWARE"] = "C++98";
-//	_env["SCRIPT_NAME"] = abs_path(config.root_directory + request.query.address);
+//	_env["SCRIPT_NAME"] = abs_path(config.rootDirectory + request.query.address);
 //	_env["SCRIPT_FILENAME"] = request.query.address;
 //	_env["PATH_INFO"] = _env["SCRIPT_NAME"];
 //	//	_env["PATH_TRANSLATED"] =
@@ -95,7 +95,7 @@ CGIRequest &CGIRequest::operator=(CGIRequest const &rhs)
 
 CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr)
 {
-	_cgi_path = config.cgi_path;
+	_cgi_path = config.cgiPath;
 	_env.push_back("QUERY_STRING=" + request.query.query_string);
 	_env.push_back("REQUEST_METHOD=" + request.query.method);
 	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
@@ -107,8 +107,8 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_env.push_back("SERVER_SOFTWARE=C++98");
 	_env.push_back("SCRIPT_NAME=" + request.query.address);
-	_env.push_back("SCRIPT_FILENAME=" + abs_path(config.root_directory + request.query.address));
-	_env.push_back("PATH_INFO=" + abs_path(config.root_directory + request.query.address));
+	_env.push_back("SCRIPT_FILENAME=" + abs_path(config.rootDirectory + request.query.address));
+	_env.push_back("PATH_INFO=" + abs_path(config.rootDirectory + request.query.address));
 	//	_env["PATH_TRANSLATED"] =
 
 	if (!request.body.empty()) {
