@@ -19,6 +19,12 @@ Server::Server(Server const &rhs) : serverConfig(rhs.serverConfig)
 
 Server &Server::operator=(Server const &rhs)
 {
+	if (this != &rhs)
+	{
+		this->socket_fd = rhs.socket_fd;
+		this->serverName = rhs.serverName;
+		this->serverConfig = rhs.serverConfig;
+	}
 	return *this;
 }
 
@@ -74,7 +80,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		} else {
 			response->putFile(this->serverConfig.rootDirectory + request->query.address);
 		}
-		result = send(sock, response->toString().data(), response->toString().length(), 0);
+		result = send(sock, response->toString().data(), response->toString().length(), MSG_DONTWAIT);
 		if (result == -1) {
 			// sending failed
 			cerr << "send failed" << endl;
@@ -93,4 +99,9 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		return false;
 	}
 	return true;
+}
+
+Server::Server()
+{
+
 }

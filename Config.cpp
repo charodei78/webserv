@@ -70,14 +70,20 @@ bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, i
     return true;
 }
 
-Config &Config::operator=(Config const &config)
+Config &Config::operator=(Config const &rhs)
 {
-	if (this != &config) {
-		port = config.port;
-        limitClientBodySize = config.port;
-		ip = config.ip;
-		domain = config.domain;
-		metaVariables = config.metaVariables;
+	if (this != &rhs) {
+		this->domain = rhs.domain;
+		this->ip = rhs.ip;
+		this->cgiPath = rhs.cgiPath;
+		this->index = rhs.index;
+		this->errorPage = rhs.errorPage;
+		this->allowedFunctions = rhs.allowedFunctions;
+		this->port = rhs.port;
+		this->limitClientBodySize = rhs.limitClientBodySize;
+		this->rootDirectory = rhs.rootDirectory;
+		this->metaVariables = rhs.metaVariables;
+		this->locations = rhs.locations;
 	}
     return *this;
 }

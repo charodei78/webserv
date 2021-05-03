@@ -20,16 +20,15 @@ namespace Http {
 
 	class Request
 	{
-		Request();
 	public:
 		query_s query;
 		string  body;
 		map<string, string> headers;
 		int     from;
 
+		Request();
 		Request *parseQuery(const string & str);
 		Request *parseHeaders(const string & str);
-		Request *parseBody(const string & str);
 
 		Request(const string& body);
 		Request(Request const &rhs);

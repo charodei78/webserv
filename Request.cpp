@@ -25,7 +25,7 @@ Request::Request(const string &request)
 
 	headers_string = message.first.substr(pos + 1);
 	parseHeaders(headers_string);
-	parseBody(message.second);
+	body = message.second;
 };
 
 Request::Request(Request const &rhs)
@@ -74,8 +74,8 @@ Request *Request::parseHeaders(const string &str)
 	return nullptr;
 }
 
-Request *Request::parseBody(const string &str)
+Request::Request()
 {
-	this->body = str;
-	return nullptr;
+
 }
+

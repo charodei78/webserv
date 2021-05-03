@@ -12,11 +12,11 @@ class Server
     private:
         int socket_fd;
         std::string serverName;
-        const Config serverConfig;
-        Server();
-
     public:
-        Server(const Config server_config);
+        Config serverConfig;
+
+	Server();
+	Server(const Config server_config);
         Server(Server const &rhs);
         Server &operator=(Server const &rhs);
         bool operator==(Server);
