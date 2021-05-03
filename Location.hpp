@@ -13,9 +13,10 @@ using namespace std;
 class Location
 {
 public:
-    const string path;
+    string path;
     map<string, string> metaVariables;
     Location(string path);
+    Location &operator=(Location const& rhs);
     ~Location();
 };
 

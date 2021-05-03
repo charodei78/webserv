@@ -48,6 +48,7 @@ pair<string, string> split_pair(string needle, string str) {
 
 string file_get_contents(const string& path)
 {
+    std::cout << "got request to  " << path << "|" << endl;
     std::ifstream t(path);
     if (!t)
         throw exception();

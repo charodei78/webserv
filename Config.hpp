@@ -17,21 +17,22 @@ static string valibleMetaVariables[10] = {
 class Config
 {
     public:
-        Config();
-        ~Config();
-        Config &operator=(Config const &);
-        string domain;
-        string ip;
-        string cgiPath;
-        string index;
-        string errorPage;
-        string allowedFunctions; //example: GET/POST , POST/GET, GET, POST
-        int port;
-        int limitClientBodySize;
-        string rootDirectory;
-        map<string, string> metaVariables;
-        vector<Location> locations;
-        void ParseMetaVariables();
+		string              domain;
+		string              ip;
+		string              cgiPath;
+		string              index;
+		string              errorPage;
+		string              allowedFunctions; //example: GET/POST , POST/GET, GET, POST
+		int                 port;
+		int                 limitClientBodySize;
+		string              rootDirectory;
+		map<string, string> metaVariables;
+		vector<Location>    locations;
+
+		Config();
+		~Config();
+		Config &operator=(Config const &rhs);
+	        void ParseMetaVariables();
     private:
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, string &fieldRef);
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, int &fieldRef);

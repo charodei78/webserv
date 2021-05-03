@@ -182,10 +182,8 @@ string CGIRequest::makeQuery( string const& body )
 		dup2(fd_out, 1);
 		close(fd_out);
 
-		if (execve(_cgi_path.c_str(), args, env) == -1) {
-
-			std::cout << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
-		}
+		if (execve(_cgi_path.c_str(), args, env) == -1)
+			cerr << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
 	} else {
 		close(fd_in);
 		close(fd_out);
