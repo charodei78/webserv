@@ -13,16 +13,16 @@ namespace Http {
 	class Response
 	{
 		map<string, string> 	headers;
-		string 					http_version;
 		std::string 			response_body;
 		unsigned 				response_status_code;
 		string 					response_status_text;
 	public:
 
-		explicit Response(const string& http_version = "1.1");
+		explicit Response();
 		Response(Response const& rhs);
 		~Response();
 		Response&       operator=(Response const& rhs);
+		Response&       operator=(string const& rhs);
 		Response        *code(unsigned code);
 		unsigned        code();
 		Response        *body(const string& body);

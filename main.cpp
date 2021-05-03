@@ -11,18 +11,18 @@ int main()
 {
     
     Config config;
-    config.port = 80;
+    config.port = 90;
     config.clientLimit = 5;
     config.ip = "127.0.0.1";
     config.domain = "localhost";
-    config.cgi_path = "../cgi/cgi_tester";
+    config.cgi_path = "../cgi/a.out";
     config.root_directory = "../public";
 
     Config newTestConfig = config;
     newTestConfig.domain = "test.localhost";
     newTestConfig.root_directory = "../test.public";
 
-    ServerListener listener(80);
+    ServerListener listener(config.port);
     
     Server server1(config);
     Server server2(newTestConfig);
@@ -37,8 +37,6 @@ int main()
     
 
     // ConfigParser parser;
-
     // list<Config> testConfigs = parser.GetServerConfigs("./test.conf");
-
     // std::cout << testConfigs.size();
 }

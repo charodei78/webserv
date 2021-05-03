@@ -5,6 +5,8 @@
 #ifndef WEBSERV_ENV_H
 #define WEBSERV_ENV_H
 
+#define TMP_PATH "../tmp"
+
 #include <string>
 
 using namespace std;

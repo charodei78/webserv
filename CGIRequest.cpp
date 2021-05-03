@@ -95,31 +95,32 @@ CGIRequest &CGIRequest::operator=(CGIRequest const &rhs)
 
 CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr)
 {
+	string host = split_pair(":", request.headers["Host"]).first;
 	_cgi_path = config.cgi_path;
 	_env.push_back("QUERY_STRING=" + request.query.query_string);
 	_env.push_back("REQUEST_METHOD=" + request.query.method);
 	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	_env.push_back("REMOTE_ADDR=" + getIP(client_addr.sin_addr.s_addr));
 	_env.push_back("REMOTE_PORT=" + to_string(client_addr.sin_port));
-	_env.push_back("SERVER_NAME=" + request.headers["Host"]);
+	_env.push_back("SERVER_NAME=" + host);
 	_env.push_back("SERVER_PORT=" + to_string(config.port));
 	_env.push_back("SERVER_ADDR=" + config.ip);
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	_env.push_back("SERVER_SOFTWARE=C++98");
 	_env.push_back("SCRIPT_NAME=" + request.query.address);
+	_env.push_back("REQUEST_URI=" + request.query.address);
 	_env.push_back("SCRIPT_FILENAME=" + abs_path(config.root_directory + request.query.address));
-	_env.push_back("PATH_INFO=" + abs_path(config.root_directory + request.query.address));
+	_env.push_back("PATH_INFO=" + request.query.address);
 	//	_env["PATH_TRANSLATED"] =
 
 	if (!request.body.empty()) {
 
-		_env.push_back("CONTENT_TYPE" + request.headers["Content-Encoding"]);
-		_env.push_back("CONTENT_LENGTH" + to_string(request.body.length()));
+		_env.push_back("CONTENT_TYPE=" + request.headers["Content-Encoding"]);
+		_env.push_back("CONTENT_LENGTH=" + to_string(request.body.length()));
 //		_env["AUTH_TYPE"] = ; // TODO: Auth type realization
 		//	_env["REMOTE_USER"] =
 	}
 
-	_env.push_back("HTTP_HOST=" + request.headers["Host"]);
+	_env.push_back("HTTP_HOST=" + host);
 	_env.push_back("HTTP_USER_AGENT=" + request.headers["User-Agent"]);
 	_env.push_back("HTTP_ACCEPT=" + request.headers["Accept"]);
 	_env.push_back("HTTP_ACCEPT_LANGUAGE=" + request.headers["Accept-Language"]);
@@ -131,11 +132,12 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	_env.push_back("");
 }
 
-void CGIRequest::makeQuery( string const& body )
+string CGIRequest::makeQuery( string const& body )
 {
 	char            *args[2];
 	char            *env[_env.size()];
 	string          program;
+	string          result = "";
 	int             status;
 	pid_t           pid;
 	int             fd_in;
@@ -150,31 +152,52 @@ void CGIRequest::makeQuery( string const& body )
 	program = _cgi_path.substr(_cgi_path.find_last_of('/'));
 	args[0] = (char*)program.c_str();
 
-	fd_in = open("./tmp_in.txt", O_CREAT);
-	fd_out = open("./tmp_out.txt", O_CREAT);
-
-	write(fd_in, body.c_str(), body.length());
-
-	pid = fork();
-	if (pid == -1) {
-		std::cout << "fork: " << strerror(errno) << std::endl;
-		return;
+	fd_in = open(TMP_PATH "/tmp_in.txt", O_CREAT|O_RDWR|O_TRUNC, 0644);
+	if (fd_in == -1){
+		pError("open");
+		return "";
 	}
+
+	fd_out = open(TMP_PATH "/tmp_out.txt", O_CREAT|O_RDWR|O_TRUNC, 0644);
+	if (fd_out == -1){
+		pError("open");
+		return "";
+	}
+
+	if (write(fd_in, body.c_str(), body.length()) == -1){
+		pError("write");
+		return "";
+	}
+	lseek(fd_in, 0, 0);
+
+	if ((pid = fork()) == -1){
+		pError("fork");
+		return "";
+	}
+
 	if (pid == 0) {
 //		dup2(pipes[1], 0);
-		dup2(fd_in, 1);
+		dup2(fd_in, 0);
 		close(fd_in);
-		dup2(fd_out, 0);
+		dup2(fd_out, 1);
 		close(fd_out);
 
 		if (execve(_cgi_path.c_str(), args, env) == -1) {
 			std::cout << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
 		}
 	} else {
-		waitpid(pid, &status, 0);
-		while (read(fd_out, buf, 255)) {
-			std::cout << buf;
-		}
+		close(fd_in);
 		close(fd_out);
+		waitpid(pid, &status, 0);
+		fd_out = open(TMP_PATH "/tmp_out.txt", O_RDWR, 0644);
+		if (fd_out == -1){
+			pError("open");
+			return "";
+		}
+		while (read(fd_out, buf, 255) > 0) {
+			result += buf;
+			bzero(buf, 255);
+		}
 	}
+	return result;
 };

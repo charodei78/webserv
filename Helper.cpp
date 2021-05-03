@@ -131,3 +131,9 @@ string  abs_path(string path) {
 		}
 	}
 }
+
+
+void pError(string const&program)
+{
+	std::cerr << program << ": " << strerror(errno) << std::endl;
+}

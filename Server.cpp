@@ -70,7 +70,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		}
 		else if (request->query.address.find("php") != string::npos) {
 			cgiRequest = new CGIRequest(*request, serverConfig, addr);
-			cgiRequest->makeQuery(request->body);
+			*response = cgiRequest->makeQuery(request->body);
 		} else {
 			response->putFile(this->serverConfig.root_directory + request->query.address);
 		}

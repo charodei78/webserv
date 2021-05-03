@@ -6,7 +6,7 @@
 
 using namespace Http;
 
-Response::Response(const string &http_version): response_status_code(200) /* server is broken */, http_version(http_version){}
+Response::Response(): response_status_code(200) {}
 
 Response * Response::code(unsigned int code)
 {
@@ -20,6 +20,7 @@ Response * Response::body(const string &body)
 	return this;
 }
 
+
 string get_mime_type(const string& path)
 {
 	int size = sizeof(Http::codes) / sizeof(int);
@@ -27,13 +28,13 @@ string get_mime_type(const string& path)
 	string      ext;
 
 	last_entry = path.find_last_of('.');
-	if (last_entry == string::npos)
-		return "text/plain";
-	ext = path.substr(last_entry + 1);
-	for (int i = 0; i < size; ++i)
-	{
-		if (Http::files_ext[i] == ext)
-			return Http::mime[i];
+	if (last_entry != string::npos) {
+		ext = path.substr(last_entry + 1);
+		for (int i = 0; i < size; ++i)
+		{
+			if (Http::files_ext[i] == ext)
+				return Http::mime[i];
+		}
 	}
 	return "text/plain";
 }
@@ -80,7 +81,7 @@ string Response::toString()
 	string message;
 
 	// make first string (ex. "HTTP/1.1 200 OK")
-	message = "HTTP/" + this->http_version + " " + to_string(this->response_status_code) + " ";
+	message = "HTTP/1.1 " + to_string(this->response_status_code) + " ";
 
 	if (!this->response_status_text.empty())
 		message += this->response_status_text;
@@ -113,7 +114,6 @@ Response &Response::operator=(const Response &rhs)
 	if (this != &rhs)
 	{
 		this->headers = rhs.headers;
-		this->http_version = rhs.http_version;
 		this->response_body = rhs.response_body;
 		this->response_status_code = rhs.response_status_code;
 		this->response_status_text = rhs.response_status_text;
@@ -144,6 +144,28 @@ const string &Response::body()
 const string &Response::header(const string &name)
 {
 	return headers[name];
+}
+
+Response &Response::operator=(const string &rhs)
+{
+	pair<string, string> message = split_pair("\n\r\n", rhs);
+	if (message.second.empty())
+		message = split_pair("\n\n", rhs);
+	body(message.second);
+
+	vector<string> structure = split('\n', message.first);
+
+
+	for (int i = 0; i < structure.size(); ++i) {
+		this->headers.insert(split_pair(": ", structure[i])); // TODO: прочитать стандарт насчет пробела
+	}
+
+	if (headers.count("Status"))
+		response_status_code = atoi(headers["Status"].c_str());
+	else
+		response_status_code = 200;
+
+	return *this;
 }
 
 
