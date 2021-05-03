@@ -82,6 +82,8 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	limitTime.tv_usec = 0;
 	Http::Request *request;
 
+	// TODO: Сделать ограничение размера входящего запроса (а лучше разбить чтение на 3 части - запрос (чтобы проверить длинну пути (414), метод (405), http (
+
 	FD_ZERO(&rfds);
 
 	FD_SET(client_socket, &rfds);
@@ -89,7 +91,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	int retval = select(client_socket + 1, &rfds, NULL, NULL, &limitTime);
 
 	string requestString = "";
-	if (retval && FD_ISSET(client_socket, &rfds)) 
+	if (retval && FD_ISSET(client_socket, &rfds))
 	{
 		char buf[256];
 		bzero(buf, 256);

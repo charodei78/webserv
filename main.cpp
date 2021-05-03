@@ -15,12 +15,12 @@ int main()
     config.clientLimit = 5;
     config.ip = "127.0.0.1";
     config.domain = "localhost";
-    config.cgi_path = "./cgi/cgi_tester";
-    config.root_directory = "./public";
+    config.cgi_path = "../cgi/cgi_tester";
+    config.root_directory = "../public";
 
     Config newTestConfig = config;
     newTestConfig.domain = "test.localhost";
-    newTestConfig.root_directory = "./test.public";
+    newTestConfig.root_directory = "../test.public";
 
     ServerListener listener(80);
     

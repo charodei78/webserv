@@ -38,6 +38,19 @@ Server::~Server()
 		close(socket_fd);
 }
 
+
+Http::Response  handleRequest()
+{
+	Http::Response response;
+
+
+
+
+
+	return response;
+}
+
+
 bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request)
 {
 	int result;
@@ -47,8 +60,9 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 
 	try 
 	{
+
 		response = new Http::Response();
-		if (request->query.address == "/") 
+		if (request->query.address == "/")
 		{
 			response
 					->body(file_get_contents(this->serverConfig.root_directory + "/image.html"))
@@ -56,7 +70,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		}
 		else if (request->query.address.find("php") != string::npos) {
 			cgiRequest = new CGIRequest(*request, serverConfig, addr);
-			cgiRequest->makeQuery();
+			cgiRequest->makeQuery(request->body);
 		} else {
 			response->putFile(this->serverConfig.root_directory + request->query.address);
 		}

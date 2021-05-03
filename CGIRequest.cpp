@@ -114,7 +114,7 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	if (!request.body.empty()) {
 
 		_env.push_back("CONTENT_TYPE" + request.headers["Content-Encoding"]);
-		_env.push_back("CONTENT_LENGTH" + request.body);
+		_env.push_back("CONTENT_LENGTH" + to_string(request.body.length()));
 //		_env["AUTH_TYPE"] = ; // TODO: Auth type realization
 		//	_env["REMOTE_USER"] =
 	}
@@ -131,14 +131,15 @@ CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in
 	_env.push_back("");
 }
 
-void CGIRequest::makeQuery()
+void CGIRequest::makeQuery( string const& body )
 {
 	char            *args[2];
 	char            *env[_env.size()];
 	string          program;
 	int             status;
 	pid_t           pid;
-	int             pipes[2];
+	int             fd_in;
+	int             fd_out;
 	char            buf[256] = {};
 
 	args[1] = nullptr;
@@ -148,7 +149,12 @@ void CGIRequest::makeQuery()
 	env[_env.size()] = nullptr;
 	program = _cgi_path.substr(_cgi_path.find_last_of('/'));
 	args[0] = (char*)program.c_str();
-	pipe(pipes);
+
+	fd_in = open("./tmp_in.txt", O_CREAT);
+	fd_out = open("./tmp_out.txt", O_CREAT);
+
+	write(fd_in, body.c_str(), body.length());
+
 	pid = fork();
 	if (pid == -1) {
 		std::cout << "fork: " << strerror(errno) << std::endl;
@@ -156,19 +162,19 @@ void CGIRequest::makeQuery()
 	}
 	if (pid == 0) {
 //		dup2(pipes[1], 0);
-		dup2(pipes[1], 1);
-		close(pipes[0]);
-		close(pipes[1]);
+		dup2(fd_in, 1);
+		close(fd_in);
+		dup2(fd_out, 0);
+		close(fd_out);
 
 		if (execve(_cgi_path.c_str(), args, env) == -1) {
 			std::cout << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
 		}
 	} else {
-		close(pipes[1]);
 		waitpid(pid, &status, 0);
-		while (read(pipes[0], buf, 255)) {
+		while (read(fd_out, buf, 255)) {
 			std::cout << buf;
 		}
-		close(pipes[0]);
+		close(fd_out);
 	}
 };
