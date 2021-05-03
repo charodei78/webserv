@@ -27,6 +27,10 @@ namespace Http {
 		map<string, string> headers;
 		int     from;
 
+		Request *parseQuery(const string & str);
+		Request *parseHeaders(const string & str);
+		Request *parseBody(const string & str);
+
 		Request(const string& body);
 		Request(Request const &rhs);
 		~Request();
