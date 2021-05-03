@@ -30,7 +30,11 @@ bool ServerListener::Intialize()
 		cerr << strerror(errno);
 		return false;
 	}
-    bind(sock, (struct sockaddr *) &addr, sizeof(addr));
+	if (::bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+    {
+        cerr << strerror(errno);
+        return false;
+    }
 	cout << "Listener with " << port << " started\n";
 	return true;
 }

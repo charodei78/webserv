@@ -48,19 +48,12 @@ pair<string, string> split_pair(string needle, string str) {
 
 string file_get_contents(const string& path)
 {
-    int configFD = open(path.c_str(), O_RDONLY);
-
-    struct stat buff;
-    stat(path.c_str(), &buff);
-    int fileSize = buff.st_size;
-
-    char fileBuff[fileSize + 1];
-
-    read(configFD, &fileBuff, fileSize);
-
-    fileBuff[fileSize] = 0;
-
-    return string(fileBuff);
+    std::ifstream t(path);
+    if (!t)
+        throw exception();
+    std::string str((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    return str;
 }
 
 string getTimestamp()
