@@ -51,8 +51,10 @@ void ServerListener::StartListen()
 	int addrlen = sizeof(client_addr);
 
 	for (;;) {
+	    std::cout << "accepting\n";
 		int client_socket = accept(sock, (struct sockaddr *) &client_addr,
 		                           reinterpret_cast<socklen_t *>(&addrlen));
+		std::cout << "accepted\n";
 		if (client_socket == 0)
 			continue;
 		else if (client_socket < 0) {
