@@ -2,7 +2,7 @@
 
 Config::Config() 
 {
-    cgiPath = "./";
+    cgiPath = "../cgi/a.out";
     port = 80;
     domain = "localhost";
     ip = "127.0.0.1";

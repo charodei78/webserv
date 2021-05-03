@@ -7,6 +7,8 @@
 
 #include "includes.hpp"
 #include "Request.hpp"
+#include "ENV.h"
+
 using namespace std;
 
 namespace Http {
@@ -23,7 +25,7 @@ class CGIRequest
 	string              _cgi_path;
 
 public:
-	void makeQuery();
+	string makeQuery( string const& body );
 	CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr);
 	~CGIRequest();
 

@@ -24,6 +24,7 @@ string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
 string& trim(string& str, const string& chars = "\t\n\v\f\r ");
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
+void pError(string const&program);
 
 string  abs_path(string path);
 
