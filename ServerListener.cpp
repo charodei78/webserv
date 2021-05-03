@@ -37,6 +37,12 @@ bool ServerListener::Intialize()
         cerr << strerror(errno);
         return false;
     }
+
+    if (listen(sock, 10) < 0)
+        return false;
+
+    fcntl(sock, F_SETFL, O_NONBLOCK);
+
 	cout << "Listener with " << port << " started\n";
 	return true;
 }
@@ -45,33 +51,29 @@ void ServerListener::StartListen()
 {
     sockaddr_in client_addr;
 
-	if (listen(sock, 10) < 0)
-		return;
-
 	int addrlen = sizeof(client_addr);
 
-	for (;;) {
-		int client_socket = accept(sock, (struct sockaddr *) &client_addr,
-		                           reinterpret_cast<socklen_t *>(&addrlen));
-		if (client_socket == 0)
-			continue;
-		else if (client_socket < 0) {
-			cerr << strerror(errno);
-			return;
-		}
+    int client_socket = accept(sock, (struct sockaddr *) &client_addr,
+                               reinterpret_cast<socklen_t *>(&addrlen));
+
+    if (client_socket == -1 && errno == 35)
+        return;
+    else if (client_socket < 0) {
+        cerr << strerror(errno);
+        return;
+    }
 
 
-		printLog(client_addr, "connected");
-		try
-		{
-			ProcessConnectionToServer(client_addr, client_socket);
-		}
-		catch (exception)
-		{
-			cerr << strerror(errno);
-		}
-		close(client_socket);
-	}
+    printLog(client_addr, "connected");
+    try
+    {
+        ProcessConnectionToServer(client_addr, client_socket);
+    }
+    catch (exception)
+    {
+        cerr << strerror(errno);
+    }
+    close(client_socket);
 }
 
 
