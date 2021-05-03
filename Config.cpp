@@ -4,6 +4,7 @@ Config::Config()
 {
     cgiPath = "../cgi/a.out";
     port = 80;
+    index = "index.html";
     domain = "localhost";
     ip = "127.0.0.1";
     limitClientBodySize = 1024;

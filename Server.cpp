@@ -65,7 +65,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		if (request->query.address == "/")
 		{
 			response
-					->body(file_get_contents(this->serverConfig.rootDirectory + "/image.html"))
+					->body(file_get_contents(this->serverConfig.rootDirectory + "/" + this->serverConfig.index))
 					->header("Content-Type", "text/html");
 		}
 		else if (request->query.address.find("php") != string::npos) {

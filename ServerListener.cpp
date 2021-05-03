@@ -43,7 +43,7 @@ bool ServerListener::Intialize()
 
     fcntl(sock, F_SETFL, O_NONBLOCK);
 
-	cout << "Listener with " << port << " started\n";
+	cout << "Listener with " << port << " ready to listen\n";
 	return true;
 }
 
@@ -126,6 +126,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 string tempHost;
 bool IsServerNameEqualHost(Server server)
 {
+    tempHost = string(tempHost.begin(), find(tempHost.begin(), tempHost.end(), ':'));
 	tempHost.erase(tempHost.find_last_not_of(" \n\r\t")+1);
     return server.GetServerName() == tempHost;
 }

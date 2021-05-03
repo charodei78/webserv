@@ -42,7 +42,8 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
 
     vector<ServerListener>::iterator listenersIterator = serverListeners.begin();
     while (listenersIterator != serverListeners.end()) {
-        listenersIterator->Intialize();
+        if (!listenersIterator->Intialize())
+            exit(1);
         listenersIterator++;
     }
 
