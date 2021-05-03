@@ -17,6 +17,8 @@ ServerListener::~ServerListener()
         close(sock);
 }
 
+int ServerListener::getPort() { return port; }
+
 bool ServerListener::Intialize()
 {
     sockaddr_in addr = sockaddr_in();
@@ -130,7 +132,7 @@ Server &ServerListener::FindServerByHost(string host)
 {
 	tempHost = host;
 	list<Server>::iterator serverIterator = find_if(servers.begin(), servers.end(), IsServerNameEqualHost);
-    if (serverIterator == servers.end())
+	if (serverIterator == servers.end())
 	{
 		return *servers.begin();
 	}

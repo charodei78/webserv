@@ -28,5 +28,16 @@ void pError(string const&program);
 
 string  abs_path(string path);
 
+template <typename T, typename  F>
+bool contains(T begin, T end, F value)
+{
+    while (begin != end)
+    {
+        begin++;
+        if (*begin == value)
+            return true;
+    }
+    return false;
+}
 
 #endif //WEBSERV_HELPER_HPP

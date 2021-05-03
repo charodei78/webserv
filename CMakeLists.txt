@@ -4,6 +4,8 @@ project(webserv)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(webserv main.cpp
+        ServerEnvironment.cpp
+        ServerEnvironment.hpp
         ConfigParser.cpp
         Config.hpp
         Config.cpp

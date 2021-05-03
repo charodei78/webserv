@@ -132,5 +132,21 @@ list<Config> ConfigParser::GetServerConfigs(const string &configFileName)
         else
             ParseError();
     }
+
+    list<Config>::iterator  iter = configs.begin();
+    while (iter != configs.end())
+    {
+        try
+        {
+            iter->ParseMetaVariables();
+        }
+        catch (exception)
+        {
+            cerr << "Invalid server fields";
+            exit(1);
+        }
+        iter++;
+    }
+
     return configs;
 }
