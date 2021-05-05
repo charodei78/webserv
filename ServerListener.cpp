@@ -156,14 +156,12 @@ bool IsServerNameEqualHost(Server server)
 {
     tempHost = string(tempHost.begin(), find(tempHost.begin(), tempHost.end(), ':'));
 	tempHost.erase(tempHost.find_last_not_of(" \n\r\t")+1);
-	cout << tempHost << " parse to " << server.GetServerName() << "|";
     return server.GetServerName() == tempHost;
 }
 
 Server &ServerListener::FindServerByHost(string host)
 {
 	tempHost = host;
-	cout << host << " host" << endl;
 	list<Server>::iterator serverIterator = find_if(servers.begin(), servers.end(), IsServerNameEqualHost);
 	if (serverIterator == servers.end())
 	{
