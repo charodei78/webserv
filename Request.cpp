@@ -50,7 +50,7 @@ Request &Request::operator=(Request const &rhs)
 
 Request *Request::parseQuery(const string &str)
 {
-	vector<string>      parts = split(' ', str);
+	vector<string>      parts = split(" ", str);
 	pair<string,string> args;
 
 	if (parts.size() != 3 || parts[0].empty() || parts[1].empty() || parts[2].empty())
@@ -66,7 +66,7 @@ Request *Request::parseQuery(const string &str)
 
 Request *Request::parseHeaders(const string &str)
 {
-	vector<string> structure = split('\n', str);
+	vector<string> structure = split("\r\n", str);
 
 	for (int i = 0; i < structure.size(); ++i) {
 		this->headers.insert(split_pair(": ", structure[i])); // TODO: прочитать стандарт насчет пробела

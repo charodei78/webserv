@@ -11,7 +11,7 @@
 
 using namespace std;
 
-vector<string> split(char c, string str);
+vector<string> split(string needle, string str);
 pair<string, string> split_pair(string needle, string str);
 
 string file_get_contents(const string& path);
@@ -25,6 +25,12 @@ string& trim(string& str, const string& chars = "\t\n\v\f\r ");
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
 void pError(string const&program);
+
+string  readLine(int fd, unsigned buf_size = 128);
+string  readBefore(int fd, string const &needle, unsigned buf_size = 256);
+string  readFull(int fd);
+string  readCount(int fd, unsigned long count);
+void    clearStorage();
 
 string  abs_path(string path);
 

@@ -25,4 +25,4 @@ add_executable(webserv main.cpp
         ServerListener.cpp
         ServerListener.hpp
         CGIRequest.cpp
-        CGIRequest.hpp)
+        CGIRequest.hpp Exceptions.cpp Exceptions.hpp)

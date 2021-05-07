@@ -91,62 +91,42 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	limitTime.tv_sec = 2;
 	limitTime.tv_usec = 0;
 
-	string requestString;
-	string query_string;
-	string headers_string;
-
-	size_t pos;
-
 	Http::Request *request;
 
 	// TODO: Сделать ограничение размера входящего запроса (а лучше разбить чтение на 3 части - запрос (чтобы проверить длинну пути (414), метод (405), http (
 
 	FD_ZERO(&rfds);
-
 	FD_SET(client_socket, &rfds);
 
 	int retval = select(client_socket + 1, &rfds, NULL, NULL, &limitTime);
 
+	if (!retval || !FD_ISSET(client_socket, &rfds))
+		return;
 
-	if (retval && FD_ISSET(client_socket, &rfds))
+	request = new Http::Request();
+
+	request->parseQuery(readLine(client_socket));
+
+	request->parseHeaders(readBefore(client_socket, "\r\n\r\n", 1024));
+
+	string host = request->headers["Host"];
+	requiredServer = FindServerByHost(host);
+	if (request->headers.count("Content-Length"))
+		if (stoi(request->headers["Content-Length"]) > requiredServer.serverConfig.limitClientBodySize)
+			throw exception(); // TODO:: 413 - Request Entity Too Large
+
+	unsigned long read_count = 1;
+
+	if (request->headers["Transfer-Encoding"] == "chunked")
 	{
-		request = new Http::Request();
-
-		char buf[256];
-		bzero(buf, 256);
-		int count;
-		while ((count = read(client_socket, buf, 255)) > 0 && count < 256)
-		{
-			requestString += buf;
-			if (query_string.empty() && (pos = requestString.find('\n')) != -1) {
-				query_string = requestString.substr(0, pos - 1);
-				requestString.erase(0, pos + 1);
-				request->parseQuery(query_string);
-			}
-			if (headers_string.empty())
-			{
-				if ((pos = requestString.find("\n\r\n")) != -1 || (pos = requestString.find("\n\n") != -1)){
-					headers_string = requestString.substr(0, pos - 1);
-					requestString.erase(0, pos + 1);
-					request->parseHeaders(headers_string);
-
-					string host = request->headers["Host"];
-					requiredServer = FindServerByHost(host);
-					if (request->headers.count("Content-Length"))
-						if (atoi(request->headers["Content-Length"].c_str()) > requiredServer.serverConfig.limitClientBodySize)
-							throw exception(); // TODO:: 413 - Request Entity Too Large
-				}
-			}
-			if (count != 255)
-				break;
-			bzero(buf, 256);
-		}
+		while ((read_count = stoi(readLine(client_socket), nullptr, 16)) > 0)
+			request->body += readCount(client_socket, read_count);
+		clearStorage();
 	}
 	else
-		return ;
+		request->body = readFull(client_socket);
 
-
-	request->body = requestString;
+	cout << request->body << endl;
 
     requiredServer.SendHttpResponse(client_addr, client_socket, request);
 }

@@ -117,7 +117,7 @@ list<Config> ConfigParser::GetServerConfigs(const string &configFileName)
 {
     list<Config> configs;
     string fileContent = file_get_contents(configFileName);
-    configLines = split('\n', fileContent);
+    configLines = split("\n", fileContent);
 
     for (iter = 0; iter < configLines.size(); iter++)
     {

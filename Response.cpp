@@ -153,7 +153,7 @@ Response &Response::operator=(const string &rhs)
 		message = split_pair("\n\n", rhs);
 	body(message.second);
 
-	vector<string> structure = split('\n', message.first);
+	vector<string> structure = split("\n", message.first);
 
 
 	for (int i = 0; i < structure.size(); ++i) {
