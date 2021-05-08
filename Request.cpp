@@ -18,7 +18,7 @@ Request::Request(const string &request)
 		message = split_pair("\n\n", request);
 	pos = message.first.find("/n");
 	if (pos == string::npos)
-		throw exception();
+		throw Http::http_exception(400, "400");
 
 	query_string = message.first.substr(0, pos - 1);
 	parseQuery(query_string);
@@ -54,7 +54,7 @@ Request *Request::parseQuery(const string &str)
 	pair<string,string> args;
 
 	if (parts.size() != 3 || parts[0].empty() || parts[1].empty() || parts[2].empty())
-		throw exception();
+		throw Http::http_exception(400, "400");
 	query.method = trim(parts[0]);
 	args = split_pair("?" , trim(parts[1]));
 	query.address = args.first;
@@ -79,3 +79,11 @@ Request::Request()
 
 }
 
+string Request::getLog(unsigned int code)
+{
+	string message = "[" + to_string(code) + "]: "
+	                 + query.method + " " + query.address;
+	if (!query.query_string.empty())
+		message += "?" + query.query_string;
+	return message;
+}

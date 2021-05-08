@@ -17,6 +17,8 @@
 #include <netinet/in.h>
 #include <cstring>
 #include <fcntl.h>
+#include <functional>
+#include "http_exception.hpp"
 #include "Helper.hpp"
 #include "Response.hpp"
 #include "Request.hpp"

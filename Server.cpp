@@ -61,37 +61,29 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 {
 	int result;
 	string message;
-	Http::Response *response;
-	CGIRequest  *cgiRequest;
+	Http::Response response;
 
 	try 
 	{
-
-		response = new Http::Response();
 		if (request->query.address == "/")
 		{
-			response
+			(&response)
 					->body(file_get_contents(this->serverConfig.rootDirectory + "/" + this->serverConfig.index))
 					->header("Content-Type", "text/html");
 		}
 		else if (request->query.address.find("php") != string::npos) {
-			cgiRequest = new CGIRequest(*request, serverConfig, addr);
-			*response = cgiRequest->makeQuery(request->body);
+			CGIRequest  cgiRequest(*request, serverConfig, addr);
+			response = cgiRequest.makeQuery(request->body);
 		} else {
-			response->putFile(this->serverConfig.rootDirectory + request->query.address);
+			response.putFile(this->serverConfig.rootDirectory + request->query.address);
 		}
-		result = send(sock, response->toString().data(), response->toString().length(), MSG_DONTWAIT);
+		string resStr = response.toString();
+		result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
 		if (result == -1) {
 			// sending failed
 			cerr << "send failed" << endl;
 		}
-		message = "[" + to_string(response->code()) + "]: "
-						+ request->query.method + " " + request->query.address;
-		if (!request->query.query_string.empty())
-			message += "?" + request->query.query_string;
-		printLog(addr,  message);
-
-		delete response;
+		printLog(addr, request->getLog(response.code()));
 
 	} catch (exception e) {
 		// query string is incorrect

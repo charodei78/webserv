@@ -67,6 +67,14 @@ bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, i
     {
         return false;
     }
+
+	if (fieldKey == "client_max_body_size") {
+		if (value.find('k') != -1)
+			fieldRef *= 1024;
+		else if (value.find('M'))
+			fieldRef *= 1048576;
+	}
+
     fieldMap.erase(fieldKey);
     return true;
 }

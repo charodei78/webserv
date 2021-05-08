@@ -34,6 +34,8 @@ namespace Http {
 		Request(Request const &rhs);
 		~Request();
 		Request &operator=(Request const &rhs);
+
+		string getLog(unsigned int code = 200);
 	};
 
 }

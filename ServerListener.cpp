@@ -69,9 +69,22 @@ void ServerListener::StartListen()
     {
         ProcessConnectionToServer(client_addr, client_socket);
     }
+    catch (Http::http_exception &e) {
+    	Http::Response  response;
+	    response.code(e.code);
+	    string message = e.what();
+	    printLog(client_addr,  message);
+	    string resStr = response.toString();
+	    int result = send(client_socket, resStr.data(), resStr.length(), MSG_DONTWAIT);
+	    if (result == -1) {
+		    // sending failed
+		    cerr << "send failed: " << errno << endl;
+	    }
+    }
     catch (exception)
     {
         cerr << strerror(errno);
+        // 500;
     }
     close(client_socket);
 }
@@ -91,9 +104,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	limitTime.tv_sec = 2;
 	limitTime.tv_usec = 0;
 
-	Http::Request *request;
-
-	// TODO: Сделать ограничение размера входящего запроса (а лучше разбить чтение на 3 части - запрос (чтобы проверить длинну пути (414), метод (405), http (
+	Http::Request request;
 
 	FD_ZERO(&rfds);
 	FD_SET(client_socket, &rfds);
@@ -103,32 +114,41 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	if (!retval || !FD_ISSET(client_socket, &rfds))
 		return;
 
-	request = new Http::Request();
 
-	request->parseQuery(readLine(client_socket));
+	request.parseQuery(readLine(client_socket));
+	if (request.query.protocol != "1.1")
+		throw Http::http_exception(505, request.getLog(505));
+	request.parseHeaders(readBefore(client_socket, "\r\n\r\n", 1024));
 
-	request->parseHeaders(readBefore(client_socket, "\r\n\r\n", 1024));
 
-	string host = request->headers["Host"];
+	string host = request.headers["Host"];
 	requiredServer = FindServerByHost(host);
-	if (request->headers.count("Content-Length"))
-		if (stoi(request->headers["Content-Length"]) > requiredServer.serverConfig.limitClientBodySize)
-			throw exception(); // TODO:: 413 - Request Entity Too Large
 
-	unsigned long read_count = 1;
+	Config *config = &requiredServer.serverConfig;
+	int BodyLimit = config->limitClientBodySize;
 
-	if (request->headers["Transfer-Encoding"] == "chunked")
+	if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == -1)
+		throw Http::http_exception(405, request.getLog(405), config);
+
+	if (request.headers.count("Content-Length"))
+		if (stoi(request.headers["Content-Length"]) > BodyLimit)
+			throw Http::http_exception(413, request.getLog(413), config);
+
+	unsigned long read_count;
+
+	if (request.headers["Transfer-Encoding"] == "chunked")
 	{
-		while ((read_count = stoi(readLine(client_socket), nullptr, 16)) > 0)
-			request->body += readCount(client_socket, read_count);
+		while ((read_count = stoi(readLine(client_socket), nullptr, 16)) > 0) {
+			request.body += readCount(client_socket, read_count);
+			if (request.body.length() > BodyLimit)
+				throw Http::http_exception(413, request.getLog(413), config);
+		}
 		clearStorage();
 	}
 	else
-		request->body = readFull(client_socket);
+		request.body = readFull(client_socket);
 
-	cout << request->body << endl;
-
-    requiredServer.SendHttpResponse(client_addr, client_socket, request);
+    requiredServer.SendHttpResponse(client_addr, client_socket, &request);
 }
 
 string tempHost;
