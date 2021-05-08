@@ -57,7 +57,7 @@ Http::Response  handleRequest()
 }
 
 
-bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request)
+bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config)
 {
 	int result;
 	string message;
@@ -65,18 +65,41 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 
 	try 
 	{
-		if (request->query.address == "/")
+		string path = serverConfig.getIndexPath(request->query.address);
+
+		if (path.empty())
+			throw Http::http_exception(404, request->getLog(404), config);
+
+		if (is_file(path)) {
+			if (config->isCGI(path))
+			{
+				CGIRequest  cgiRequest(*request, serverConfig, addr);
+				response = cgiRequest.makeQuery(request->body);
+			} else {
+				response.putFile(path);
+			}
+		}
+		else if (config->metaVariables["autoindex"] == "on")
 		{
-			(&response)
-					->body(file_get_contents(this->serverConfig.rootDirectory + "/" + this->serverConfig.index))
-					->header("Content-Type", "text/html");
+			vector<string> *dirs = get_dir_content(path);
+			string body;
+
+			if (dirs == nullptr)
+				throw Http::http_exception(500, request->getLog(500), config);
+
+			string webPath = "<a href=\"" + request->query.address;
+			if (*(--request->query.address.end()) != '/')
+				webPath += '/';
+			for (int i = 0; i < dirs->size(); i++) {
+				body += webPath + (*dirs)[i] + "\">" + (*dirs)[i] + "</a><br>" ;
+			}
+			response.body(body);
+			response.header("Content-Type", "text/html");
+			delete dirs;
 		}
-		else if (request->query.address.find("php") != string::npos) {
-			CGIRequest  cgiRequest(*request, serverConfig, addr);
-			response = cgiRequest.makeQuery(request->body);
-		} else {
-			response.putFile(this->serverConfig.rootDirectory + request->query.address);
-		}
+		else
+			throw Http::http_exception(403, request->getLog(403), config);
+
 		string resStr = response.toString();
 		result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
 		if (result == -1) {

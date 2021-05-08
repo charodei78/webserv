@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <ctime>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <cerrno>
 #include <netinet/in.h>
 #include <cstring>

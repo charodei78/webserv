@@ -6,6 +6,7 @@
 #define HELPER_HPP
 
 #include "includes.hpp"
+#include "dirent.h"
 #include <fstream> // TODO: #include <fstream>
 #include <libc.h>
 
@@ -25,6 +26,12 @@ string& trim(string& str, const string& chars = "\t\n\v\f\r ");
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
 void pError(string const&program);
+
+bool is_file(string const&path);
+bool is_dir(string const&path);
+bool exists(string const&path);
+
+vector<string> *get_dir_content(string const &path);
 
 string  readLine(int fd, unsigned buf_size = 128);
 string  readBefore(int fd, string const &needle, unsigned buf_size = 256);

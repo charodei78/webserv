@@ -24,7 +24,7 @@ class Server
         std::string GetServerName();
         void startServer();
         void closeServer();
-        bool SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request);
+        bool SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config);
         static void printLog(sockaddr_in client_addr, const string& message);
 };
 

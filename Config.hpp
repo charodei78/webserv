@@ -10,6 +10,7 @@
 using namespace std;
 
 static string valibleMetaVariables[10] = {
+		"autoindex",
         "index",
         "error_page",
         "client_max_body_size"};
@@ -32,8 +33,13 @@ class Config
 		Config();
 		~Config();
 		Config &operator=(Config const &rhs);
-	        void ParseMetaVariables();
-    private:
+	    void ParseMetaVariables();
+
+	    string getIndexPath(string path);
+
+	bool isCGI(string const &basicString);
+
+private:
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, string &fieldRef);
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, int &fieldRef);
 };

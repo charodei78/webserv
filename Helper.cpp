@@ -183,7 +183,6 @@ void clearStorage()
 	storage = "";
 }
 
-
 string readCount(int fd, unsigned long count)
 {
 	char *buf = new char[count]{0};
@@ -213,5 +212,47 @@ string readFull(int fd)
 		result += buf;
 		memset(buf, 0, 2048);
 	}
+	return result;
+}
+
+bool is_file(string const&path)
+{
+	struct stat buf{};
+	if (stat(path.c_str(), &buf) == -1)
+		return false;
+	return S_ISREG(buf.st_mode);
+}
+
+bool is_dir(string const&path)
+{
+	struct stat buf{};
+	if (stat(path.c_str(), &buf) == -1)
+		return false;
+	return S_ISDIR(buf.st_mode);
+}
+
+bool exists(string const&path)
+{
+	struct stat buf{};
+	if (stat(path.c_str(), &buf) == -1)
+		return false;
+	return true;
+}
+
+vector<string> *get_dir_content(string const &path) {
+	vector<string> *result;
+	DIR *dir = opendir(path.c_str());
+	struct dirent* dirent;
+
+	if (!dir)
+		return nullptr;
+
+	result = new vector<string>;
+
+	while ((dirent = readdir(dir)) != nullptr)
+		result->push_back(dirent->d_name);
+
+	closedir(dir);
+
 	return result;
 }
