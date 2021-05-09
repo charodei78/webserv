@@ -56,17 +56,17 @@ void Config::ParseMetaVariables()
         auth_file_content = split("\n", auth_file);
     }
 
-    vector<Location>::iterator locationBegin = locations.begin();
-    while (locationBegin != locations.end())
-    {
-        Location &location = *locationBegin;
-        Config configCopy;
-        configCopy = *this;
-        configCopy.metaVariables = location.metaVariables;
-        configCopy.ParseMetaVariables();
-        location.server = new Server(configCopy);
-        locationBegin++;
-    }
+//    vector<Location>::iterator locationBegin = locations.begin();
+//    while (locationBegin != locations.end())
+//    {
+//        Location &location = *locationBegin;
+//        Config configCopy;
+//        configCopy = *this;
+//        configCopy.metaVariables = location.metaVariables;
+//        configCopy.ParseMetaVariables();
+//        location.server = new Server(configCopy);
+//        locationBegin++;
+//    }
 }
 
 //возвращает, нашел ли он это поле, если он его нашел, но его не получилось запарсить, выкинет exception

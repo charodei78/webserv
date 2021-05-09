@@ -5,7 +5,6 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include "Server.hpp"
 #include <map>
 #include <string>
 
@@ -16,7 +15,7 @@ class Location
 public:
     string path;
     map<string, string> metaVariables;
-    Server *server;
+//    Server *server; TODO: ПОФИКСИТЬ ЭТУ ХЕРЬ
     Location(string path);
     Location &operator=(Location const& rhs);
     ~Location();

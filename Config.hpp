@@ -1,7 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Server.hpp"
 #include "Location.hpp"
 #include <vector>
 #include <string>
