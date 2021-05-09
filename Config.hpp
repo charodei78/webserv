@@ -1,10 +1,11 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <string>
-#include <map>
+#include "Server.hpp"
 #include "Location.hpp"
 #include <vector>
+#include <string>
+#include <map>
 #include <iostream>
 
 using namespace std;

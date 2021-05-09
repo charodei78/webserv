@@ -1,5 +1,5 @@
-#include "Config.hpp"
 #include "Helper.hpp"
+#include "Config.hpp"
 
 Config::Config() 
 {
@@ -54,6 +54,18 @@ void Config::ParseMetaVariables()
             throw exception();
         }
         auth_file_content = split("\n", auth_file);
+    }
+
+    vector<Location>::iterator locationBegin = locations.begin();
+    while (locationBegin != locations.end())
+    {
+        Location &location = *locationBegin;
+        Config configCopy;
+        configCopy = *this;
+        configCopy.metaVariables = location.metaVariables;
+        configCopy.ParseMetaVariables();
+        location.server = new Server(configCopy);
+        locationBegin++;
     }
 }
 
