@@ -15,6 +15,7 @@ class Location
 public:
     string path;
     map<string, string> metaVariables;
+//    Server *server; TODO: ПОФИКСИТЬ ЭТУ ХЕРЬ
     Location(string path);
     Location &operator=(Location const& rhs);
     ~Location();

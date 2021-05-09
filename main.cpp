@@ -1,12 +1,5 @@
- #include "Server.hpp"
- #include <iostream>
-#include <fstream>
-#include "Response.hpp"
-#include "Helper.hpp"
-#include "Server.hpp"
-#include "ServerEnvironment.hpp"
 #include "ConfigParser.hpp"
-#include "ServerListener.hpp"
+#include "ServerEnvironment.hpp"
 
 int main()
 {
@@ -27,7 +20,8 @@ int main()
 
      ConfigParser parser;
 
-     list<Config> testConfigs = parser.GetServerConfigs("../eval.conf");
-    ServerEnvironment env;
-    env.RunServers(testConfigs);
+        list<Config> testConfigs = parser.GetServerConfigs("../eval.conf");
+        ServerEnvironment env;
+        env.RunServers(testConfigs);
+
 }

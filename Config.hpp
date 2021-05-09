@@ -1,10 +1,10 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <string>
-#include <map>
 #include "Location.hpp"
 #include <vector>
+#include <string>
+#include <map>
 #include <iostream>
 
 using namespace std;
@@ -27,6 +27,8 @@ class Config
 		int                 port;
 		int                 limitClientBodySize;
 		bool                auth;
+		string              auth_file_path;
+		vector<string>      auth_file_content;
 		string              rootDirectory;
 		map<string, string> metaVariables;
 		vector<Location>    locations;

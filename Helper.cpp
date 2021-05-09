@@ -141,7 +141,7 @@ int file_put_contents(string filename, const string &data, int rights)
 			if (create_dir(filename.substr(0, index)) == -1)
 				return pError("mkdir");
 	}
-	fd = open(filename.c_str(), O_CREAT | O_WRONLY, rights);
+	fd = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, rights);
 	if (fd == -1)
 		return pError("open");
 	if (write(fd, data.c_str(), data.size()) == -1)
