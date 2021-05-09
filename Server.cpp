@@ -56,6 +56,18 @@ Http::Response  handleRequest()
 	return response;
 }
 
+void Server::SendAuthorizationRequest(const sockaddr_in &addr, const int sock)
+{
+    Http::Response response;
+
+    response.code(401);
+    response.statusText("Unauthorized");
+    response.header("WWW-Authenticate", "Basic realm=\"Access to the staging site\", charset=\"UTF-8\"");
+    string resStr = response.toString();
+    send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
+    printLog(addr, "401 Unathorized");
+}
+
 
 bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request)
 {

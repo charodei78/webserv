@@ -127,6 +127,20 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	Config *config = &requiredServer.serverConfig;
 	int BodyLimit = config->limitClientBodySize;
 
+	if (config->auth)
+	{
+	    if (request.headers.count("Authorization"))
+	    {
+	        std::cout << "Authorization = " << request.headers["Authorization"] << endl;
+	        //TODO: Проверить правильны ли пришедшие данные, с файла с авторизациями
+	    }
+        else
+        {
+            requiredServer.SendAuthorizationRequest(client_addr, client_socket);
+	        return;
+        }
+	}
+
 	if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == -1)
 		throw Http::http_exception(405, request.getLog(405), config);
 
