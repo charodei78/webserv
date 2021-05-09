@@ -27,6 +27,8 @@ class Config
 		int                 port;
 		int                 limitClientBodySize;
 		bool                auth;
+		string              auth_file_path;
+		vector<string>      auth_file_content;
 		string              rootDirectory;
 		map<string, string> metaVariables;
 		vector<Location>    locations;

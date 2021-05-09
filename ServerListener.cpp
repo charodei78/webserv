@@ -136,7 +136,13 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	{
 	    if (request.headers.count("Authorization"))
 	    {
-	        std::cout << "Authorization = " << request.headers["Authorization"] << endl;
+	        string authEncoded = request.headers["Authorization"];
+	        authEncoded = string(find(authEncoded.begin(), authEncoded.end(), ' ') + 1, authEncoded.end());
+	        if (find(config->auth_file_content.begin(), config->auth_file_content.end(), authEncoded) == config->auth_file_content.end())
+	        {
+                requiredServer.SendAuthorizationRequest(client_addr, client_socket);
+                return;
+            }
 	        //TODO: Проверить правильны ли пришедшие данные, с файла с авторизациями
 	    }
         else

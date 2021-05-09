@@ -4,6 +4,7 @@
 Config::Config() 
 {
     auth = false;
+    auth_file_path = "../.htpasswd";
     cgiPath = "../cgi/a.out";
     port = 80;
     index = "index.html";
@@ -27,6 +28,7 @@ void Config::ParseMetaVariables()
     parseFieldFromMap(unusedOptions, "root", rootDirectory);
     parseFieldFromMap(unusedOptions, "listen", port);
     parseFieldFromMap(unusedOptions, "client_max_body_size", limitClientBodySize);
+    parseFieldFromMap(unusedOptions, "basic_auth_file", auth_file_path);
     parseFieldFromMap(unusedOptions, "basic_auth", auth);
 
     if (unusedOptions.size() > 0)
@@ -38,6 +40,20 @@ void Config::ParseMetaVariables()
             iter++;
         }
         throw exception();
+    }
+    if (auth)
+    {
+        string auth_file;
+        try
+        {
+            auth_file = file_get_contents(auth_file_path);
+        }
+        catch (exception)
+        {
+            cerr << "Invalid auth file\n";
+            throw exception();
+        }
+        auth_file_content = split("\n", auth_file);
     }
 }
 
@@ -117,6 +133,8 @@ Config &Config::operator=(Config const &rhs)
 		this->metaVariables = rhs.metaVariables;
 		this->locations = rhs.locations;
 		this->auth = rhs.auth;
+		this->auth_file_content = rhs.auth_file_content;
+		this->auth_file_path = rhs.auth_file_path;
 	}
     return *this;
 }
