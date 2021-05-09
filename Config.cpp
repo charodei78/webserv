@@ -3,6 +3,7 @@
 
 Config::Config() 
 {
+    auth = false;
     cgiPath = "../cgi/a.out";
     port = 80;
     index = "index.html";
@@ -26,6 +27,7 @@ void Config::ParseMetaVariables()
     parseFieldFromMap(unusedOptions, "root", rootDirectory);
     parseFieldFromMap(unusedOptions, "listen", port);
     parseFieldFromMap(unusedOptions, "client_max_body_size", limitClientBodySize);
+    parseFieldFromMap(unusedOptions, "basic_auth", auth);
 
     if (unusedOptions.size() > 0)
     {
@@ -80,6 +82,26 @@ bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, i
     return true;
 }
 
+bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, bool &fieldRef)
+{
+    if (fieldMap.count(fieldKey) == 0)
+        return false;
+
+    string value = fieldMap[fieldKey];
+
+    if (value == "on")
+    {
+        fieldRef = true;
+    }
+    else if (value == "off")
+        fieldRef = false;
+    else
+        return false;
+
+    fieldMap.erase(fieldKey);
+    return true;
+}
+
 Config &Config::operator=(Config const &rhs)
 {
 	if (this != &rhs) {
@@ -94,6 +116,7 @@ Config &Config::operator=(Config const &rhs)
 		this->rootDirectory = rhs.rootDirectory;
 		this->metaVariables = rhs.metaVariables;
 		this->locations = rhs.locations;
+		this->auth = rhs.auth;
 	}
     return *this;
 }

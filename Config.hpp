@@ -26,6 +26,7 @@ class Config
 		string              allowedFunctions; //example: GET/POST , POST/GET, GET, POST
 		int                 port;
 		int                 limitClientBodySize;
+		bool                auth;
 		string              rootDirectory;
 		map<string, string> metaVariables;
 		vector<Location>    locations;
@@ -42,6 +43,7 @@ class Config
 private:
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, string &fieldRef);
         bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, int &fieldRef);
+        bool parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, bool &fieldRef);
 };
 
 #endif
