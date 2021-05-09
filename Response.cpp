@@ -32,7 +32,7 @@ string get_mime_type(const string& path)
 		ext = path.substr(last_entry + 1);
 		for (int i = 0; i < size; ++i)
 		{
-			if (Http::files_ext[i] == ext)
+			if (Http::files_ext[i].find(ext) != -1)
 				return Http::mime[i];
 		}
 	}

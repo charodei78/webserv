@@ -20,13 +20,14 @@ class CGIRequest
 	CGIRequest();
 	CGIRequest(CGIRequest const &rhs);
 
+
 //	map<string, string> _env;
 	vector<string>      _env;
 	string              _cgi_path;
 
 public:
 	string makeQuery( string const& body );
-	CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr);
+	CGIRequest(Http::Request &request, Config &config, sockaddr_in client_addr);
 	~CGIRequest();
 
 	CGIRequest &operator=(CGIRequest const &rhs);

@@ -72,6 +72,11 @@ void ServerListener::StartListen()
     catch (Http::http_exception &e) {
     	Http::Response  response;
 	    response.code(e.code);
+	    try {
+		    response.putFile(DEFAULT_ERROR_PAGE);
+	    } catch (exception &e) {
+	    	cerr << e.what() << endl;
+	    }
 	    string message = e.what();
 	    printLog(client_addr,  message);
 	    string resStr = response.toString();
@@ -162,7 +167,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	else
 		request.body = readFull(client_socket);
 
-    requiredServer.SendHttpResponse(client_addr, client_socket, &request);
+    requiredServer.SendHttpResponse(client_addr, client_socket, &request, config);
 }
 
 string tempHost;

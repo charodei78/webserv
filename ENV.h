@@ -6,6 +6,7 @@
 #define WEBSERV_ENV_H
 
 #define TMP_PATH "../tmp"
+#define DEFAULT_ERROR_PAGE "../html/error.html"
 
 #include <string>
 

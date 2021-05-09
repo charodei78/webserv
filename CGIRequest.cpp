@@ -93,7 +93,7 @@ CGIRequest &CGIRequest::operator=(CGIRequest const &rhs)
 //}
 
 
-CGIRequest::CGIRequest(Http::Request &request, const Config& config, sockaddr_in client_addr)
+CGIRequest::CGIRequest(Http::Request &request, Config& config, sockaddr_in client_addr)
 {
 	string host = split_pair(":", request.headers["Host"]).first;
 	_cgi_path = config.cgiPath;
