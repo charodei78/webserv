@@ -104,39 +104,86 @@ std::string& trim(std::string& str, const std::string& chars)
     return ltrim(rtrim(str, chars), chars);
 }
 
+int create_dir(string path, int rights)
+{
+	unsigned    index;
+	int         result;
+	string      target;
+
+	if (path[0] != '/')
+		path = abs_path(path);
+	if (is_dir(path))
+		return (0);
+	if (path == ".." || path == ".")
+		return (0);
+	index = path.find_last_of('/');
+	if (index != -1) {
+		target = path.substr(0, index);
+		if (!is_dir(target))
+			result = create_dir(target, rights);
+	}
+	if (result == -1)
+		return -1;
+	return mkdir(path.c_str(), rights);
+}
+
+int file_put_contents(string filename, const string &data, int rights)
+{
+	unsigned    index;
+	int         fd;
+
+	if (filename.empty())
+		return -1;
+	filename = abs_path(filename);
+	if (!is_file(filename)) {
+		index = filename.find_last_of('/');
+		if (index != -1)
+			if (create_dir(filename.substr(0, index)) == -1)
+				return pError("mkdir");
+	}
+	fd = open(filename.c_str(), O_CREAT | O_WRONLY, rights);
+	if (fd == -1)
+		return pError("open");
+	if (write(fd, data.c_str(), data.size()) == -1)
+	{
+		pError("write");
+		close(fd);
+		return -1;
+	}
+	close(fd);
+	return 0;
+}
+
 
 string  abs_path(string path) {
 	string  result;
+	int     index;
+	string  tmp;
 	char    buf[512] = {};
+	vector<string> folders;
 
 	if (path[0] == '/')
 		return path;
 	getcwd(buf, sizeof(buf));
 	result = buf;
+	folders = split("/", path);
 
-	while (1) {
-		if (path.find("../") == 0) {
-			result = result.substr(0, result.find_last_of('/'));
-			path = path.substr(3);
-		}
-		else if (path.find("./") == 0) {
-			path = path.substr(2);
+	for (int i = 0; i < folders.size(); i++) {
+		tmp = folders[i];
+		if (tmp == "..")
+			result.erase(result.find_last_of('/'), result.size());
+		else if (tmp == "." || tmp.empty())
 			continue ;
-		}
 		else
-		{
-			if (path[0] == '/')
-				return result + path;
-			else
-				return result += "/" + path;
-		}
+			result += "/" + tmp;
 	}
+	return result;
 }
 
-
-void pError(string const&program)
+int pError(string const&program)
 {
 	std::cerr << program << ": " << strerror(errno) << std::endl;
+	return -1;
 }
 
 static string storage;
@@ -239,7 +286,8 @@ bool exists(string const&path)
 	return true;
 }
 
-vector<string> *get_dir_content(string const &path) {
+vector<string> *get_dir_content(string const &path)
+{
 	vector<string> *result;
 	DIR *dir = opendir(path.c_str());
 	struct dirent* dirent;

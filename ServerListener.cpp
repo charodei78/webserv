@@ -164,10 +164,14 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 		}
 		clearStorage();
 	}
-	else
-		request.body = readFull(client_socket);
-
-    requiredServer.SendHttpResponse(client_addr, client_socket, &request, config);
+	else {
+		if (request.headers.count("Content-Length"))
+			request.body = readCount(client_socket, stoi(request.headers["Content-Length"]));
+		else
+			request.body = readFull(client_socket);
+	}
+	clearStorage();
+	requiredServer.SendHttpResponse(client_addr, client_socket, &request, config);
 }
 
 string tempHost;

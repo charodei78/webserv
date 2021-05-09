@@ -75,8 +75,21 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 	string message;
 	Http::Response response;
 
-	try 
-	{
+	if (request->query.method == "PUT") {
+		string path = config->rootDirectory + request->query.address;
+		bool file_exists = exists(path);
+		if (file_put_contents(path, request->body, 0666) == -1) {
+			response.code(404);
+		}
+		else {
+			if (file_exists)
+				response.code(204);
+			else
+				response.code(201);
+			response.header("Content-Location", request->query.address);
+		}
+	}
+	else {
 		string path = serverConfig.getIndexPath(request->query.address);
 
 		if (path.empty())
@@ -111,20 +124,16 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		}
 		else
 			throw Http::http_exception(403, request->getLog(403), config);
-
-		string resStr = response.toString();
-		result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
-		if (result == -1) {
-			// sending failed
-			cerr << "send failed" << endl;
-		}
-		printLog(addr, request->getLog(response.code()));
-
-	} catch (exception e) {
-		// query string is incorrect
-		printLog(addr,  strerror(errno));
-		return false;
 	}
+
+	string resStr = response.toString();
+	result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
+	if (result == -1) {
+		// sending failed
+		cerr << "send failed" << endl;
+	}
+	printLog(addr, request->getLog(response.code()));
+
 	return true;
 }
 
