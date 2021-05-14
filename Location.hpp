@@ -8,6 +8,10 @@
 #include <map>
 #include <string>
 
+//#include "Server.hpp"
+
+class Config;
+
 using namespace std;
 
 class Location
@@ -15,10 +19,16 @@ class Location
 public:
     string path;
     map<string, string> metaVariables;
-//    Server *server; TODO: ПОФИКСИТЬ ЭТУ ХЕРЬ
+    Config *config;
     Location(string path);
-    Location &operator=(Location const& rhs);
+    Location &operator=(const Location & rhs);
+    bool IsUriValid(const string &uri) const;
+    bool operator<(const Location rhs) const;
     ~Location();
+
+    bool IsUriValid(const string uri);
 };
+
+//#include "Server.hpp"
 
 #endif

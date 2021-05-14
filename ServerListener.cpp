@@ -128,6 +128,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 
 	string host = request.headers["Host"];
 	requiredServer = FindServerByHost(host);
+	requiredServer = requiredServer.GetLocationServer(request.query.address);
 
 	Config *config = &requiredServer.serverConfig;
 	int BodyLimit = config->limitClientBodySize;

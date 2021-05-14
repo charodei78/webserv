@@ -1,6 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+//#include "Server.hpp"
 #include "Location.hpp"
 #include <vector>
 #include <string>
@@ -27,6 +28,7 @@ class Config
 		int                 port;
 		int                 limitClientBodySize;
 		bool                auth;
+		bool                autoindex;
 		string              auth_file_path;
 		vector<string>      auth_file_content;
 		string              rootDirectory;

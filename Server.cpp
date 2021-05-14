@@ -7,23 +7,31 @@ void Server::printLog(sockaddr_in client_addr, const string &message = "")
 	     << message << endl;
 }
 
-Server::Server(const Config config) : serverConfig(config)
+Server::Server(Config config) : serverConfig(config)
 {
 	serverName = config.domain;
+	vector<Location>::iterator begin = config.locations.begin();
+    while (begin != config.locations.end())
+    {
+        Location &location = *begin;
+        locations[location] = Server(*location.config);
+        begin++;
+    }
 }
 
 Server::Server(Server const &rhs) : serverConfig(rhs.serverConfig)
 {
 	serverName = rhs.serverName;
+	locations = rhs.locations;
 }
 
 Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
 	{
-		this->socket_fd = rhs.socket_fd;
 		this->serverName = rhs.serverName;
 		this->serverConfig = rhs.serverConfig;
+		this->locations = rhs.locations;
 	}
 	return *this;
 }
@@ -40,8 +48,6 @@ bool Server::operator==(Server server)
 
 Server::~Server()
 {
-	if (socket_fd > 0)
-		close(socket_fd);
 }
 
 
@@ -62,12 +68,25 @@ void Server::SendAuthorizationRequest(const sockaddr_in &addr, const int sock)
 
     response.code(401);
     response.statusText("Unauthorized");
-    response.header("WWW-Authenticate", "Basic realm=\"Access to the staging site\", charset=\"UTF-8\"");
+    response.header("WWW-Authenticate", R"(Basic realm="Access to the staging site", charset="UTF-8")");
     string resStr = response.toString();
     send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
     printLog(addr, "401 Unathorized");
 }
 
+Server &Server::GetLocationServer(const string &uri)
+{
+    map<Location, Server>::iterator locationsIter = locations.begin();
+
+    while (locationsIter != locations.end())
+    {
+        if ((*locationsIter).first.IsUriValid(uri))
+            return (*locationsIter).second;
+        locationsIter++;
+    }
+
+    return *this;
+}
 
 bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config)
 {
@@ -104,7 +123,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 				response.putFile(path);
 			}
 		}
-		else if (config->metaVariables["autoindex"] == "on")
+		else if (config->autoindex)
 		{
 			vector<string> *dirs = get_dir_content(path);
 			string body;
@@ -140,4 +159,8 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 Server::Server()
 {
 
+}
+
+Server *Server::GetServerLocation(string path) {
+    return nullptr;
 }

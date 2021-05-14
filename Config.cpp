@@ -30,6 +30,7 @@ void Config::ParseMetaVariables()
     parseFieldFromMap(unusedOptions, "client_max_body_size", limitClientBodySize);
     parseFieldFromMap(unusedOptions, "basic_auth_file", auth_file_path);
     parseFieldFromMap(unusedOptions, "basic_auth", auth);
+    parseFieldFromMap(unusedOptions, "autoindex", autoindex);
 
     if (unusedOptions.size() > 0)
     {
@@ -56,17 +57,18 @@ void Config::ParseMetaVariables()
         auth_file_content = split("\n", auth_file);
     }
 
-//    vector<Location>::iterator locationBegin = locations.begin();
-//    while (locationBegin != locations.end())
-//    {
-//        Location &location = *locationBegin;
-//        Config configCopy;
-//        configCopy = *this;
-//        configCopy.metaVariables = location.metaVariables;
-//        configCopy.ParseMetaVariables();
-//        location.server = new Server(configCopy);
-//        locationBegin++;
-//    }
+    vector<Location>::iterator locationBegin = locations.begin();
+    while (locationBegin != locations.end())
+    {
+        Location &location = *locationBegin;
+        Config configCopy;
+        configCopy = *this;
+        configCopy.locations = vector<Location>();
+        configCopy.metaVariables = location.metaVariables;
+        configCopy.ParseMetaVariables();
+        location.config = new Config(configCopy);
+        locationBegin++;
+    }
 }
 
 //возвращает, нашел ли он это поле, если он его нашел, но его не получилось запарсить, выкинет exception
