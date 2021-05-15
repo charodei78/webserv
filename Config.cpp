@@ -183,7 +183,7 @@ string Config::getIndexPath(string path)
 
 bool Config::isCGI(const string &basicString)
 {
-	return false;
+	return !this->cgiPath.empty();
 }
 
 

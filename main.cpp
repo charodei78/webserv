@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
      ConfigParser parser;
 
-        list<Config> testConfigs = parser.GetServerConfigs("../eval.conf");
+        list<Config> testConfigs = parser.GetServerConfigs("../test2.conf");
         ServerEnvironment env;
         env.RunServers(testConfigs);
 
