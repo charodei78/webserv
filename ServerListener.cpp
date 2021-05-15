@@ -70,14 +70,23 @@ void ServerListener::StartListen()
     {
         ProcessConnectionToServer(client_addr, client_socket);
     }
-    catch (exception &e) {
+    catch (exception &e)
+    {
+    	string error_page;
+
     	try {
-		    response.code(dynamic_cast<Http::http_exception&>(e).code);
+		    Http::http_exception &ex_tmp = (Http::http_exception&)(e);
+		    response.code(ex_tmp.code);
+		    if (ex_tmp.config)
+		        error_page = ex_tmp.config->errorPage;
+		    if (error_page.empty())
+		        error_page = DEFAULT_ERROR_PAGE;
 	    } catch (exception) {
 		    response.code(500);
+		    error_page = DEFAULT_ERROR_PAGE;
 	    }
 	    try {
-		    response.putFile(DEFAULT_ERROR_PAGE); // TODO: custom error page
+		    response.putFile(error_page);
 	    } catch (exception &e) {
 	    	cerr << e.what() << endl;
 	    }
