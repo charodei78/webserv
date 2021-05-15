@@ -23,6 +23,7 @@ string getIP(unsigned long ip);
 string& ltrim(string& str, const string& chars = "\t\n\v\f\r ");
 string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
 string& trim(string& str, const string& chars = "\t\n\v\f\r ");
+
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
 int pError(string const&program);
@@ -32,12 +33,6 @@ bool is_dir(string const&path);
 bool exists(string const&path);
 
 vector<string> *get_dir_content(string const &path);
-
-string  readLine(int fd, unsigned buf_size = 128);
-string  readBefore(int fd, string const &needle, unsigned buf_size = 256);
-string  readFull(int fd);
-string  readCount(int fd, unsigned long count);
-void    clearStorage();
 
 int     create_dir(string path, int rights = 0777);
 int file_put_contents(string filename, const string &data, int rights = 0777);

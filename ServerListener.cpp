@@ -49,6 +49,7 @@ bool ServerListener::Intialize()
 
 void ServerListener::StartListen()
 {
+	Http::Response  response;
     sockaddr_in client_addr;
 
 	int addrlen = sizeof(client_addr);
@@ -69,11 +70,14 @@ void ServerListener::StartListen()
     {
         ProcessConnectionToServer(client_addr, client_socket);
     }
-    catch (Http::http_exception &e) {
-    	Http::Response  response;
-	    response.code(e.code);
+    catch (exception &e) {
+    	try {
+		    response.code(dynamic_cast<Http::http_exception&>(e).code);
+	    } catch (exception) {
+		    response.code(500);
+	    }
 	    try {
-		    response.putFile(DEFAULT_ERROR_PAGE);
+		    response.putFile(DEFAULT_ERROR_PAGE); // TODO: custom error page
 	    } catch (exception &e) {
 	    	cerr << e.what() << endl;
 	    }
@@ -85,11 +89,6 @@ void ServerListener::StartListen()
 		    // sending failed
 		    cerr << "send failed: " << errno << endl;
 	    }
-    }
-    catch (exception)
-    {
-        cerr << strerror(errno);
-        // 500;
     }
     close(client_socket);
 }
@@ -103,6 +102,7 @@ void ServerListener::StartListen()
 void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int client_socket)
 {
 	Server requiredServer;
+	Reader reader;
 
 	fd_set rfds;
 	timeval limitTime;
@@ -120,10 +120,10 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 		return;
 
 
-	request.parseQuery(readLine(client_socket));
+	request.parseQuery(reader.readLine(client_socket));
 	if (request.query.protocol != "1.1")
 		throw Http::http_exception(505, request.getLog(505));
-	request.parseHeaders(readBefore(client_socket, "\r\n\r\n", 1024));
+	request.parseHeaders(reader.readBefore(client_socket, "\r\n\r\n", 1024));
 
 
 	string host = request.headers["Host"];
@@ -164,20 +164,18 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 
 	if (request.headers["Transfer-Encoding"] == "chunked")
 	{
-		while ((read_count = stoi(readLine(client_socket), nullptr, 16)) > 0) {
-			request.body += readCount(client_socket, read_count);
+		while ((read_count = stoi(reader.readLine(client_socket), nullptr, 16)) > 0) {
+			request.body += reader.readCount(client_socket, read_count);
 			if (request.body.length() > BodyLimit)
 				throw Http::http_exception(413, request.getLog(413), config);
 		}
-		clearStorage();
 	}
 	else {
 		if (request.headers.count("Content-Length"))
-			request.body = readCount(client_socket, stoi(request.headers["Content-Length"]));
+			request.body = reader.readCount(client_socket, stoi(request.headers["Content-Length"]));
 		else
-			request.body = readFull(client_socket);
+			request.body = reader.readFull(client_socket);
 	}
-	clearStorage();
 	requiredServer.SendHttpResponse(client_addr, client_socket, &request, config);
 }
 
