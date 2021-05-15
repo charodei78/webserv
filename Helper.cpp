@@ -196,16 +196,20 @@ string readBefore(int fd, string const &needle, unsigned buf_size)
 	long     n_pos = -1;
 	char    *buf = new char[buf_size + 1]{0};
 
+	errno = 0;
 	while (true)
 	{
 		if (storage.empty()) {
-			if (read(fd, buf, buf_size) < 0)
+			if ((n_pos = read(fd, buf, buf_size)) < 0)
 				break;
 			tmp = buf;
 		} else {
 			tmp = storage;
 		}
-		memset(buf, 0, buf_size);
+//        if (tmp.find("GET /directory/you") != -1) {
+//            cout << "tet";
+//            cout << errno << " " << n_pos << endl;
+        memset(buf, 0, buf_size);
 		n_pos = tmp.find(needle);
 		if (n_pos != -1)
 		{
@@ -216,6 +220,8 @@ string readBefore(int fd, string const &needle, unsigned buf_size)
 			storage = "";
 		result += tmp;
 	}
+
+//	cout << result << "|" << endl;
 	delete[] buf;
 	return result;
 }

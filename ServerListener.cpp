@@ -17,7 +17,7 @@ ServerListener::~ServerListener()
         close(sock);
 }
 
-int ServerListener::getPort() { return port; }
+int ServerListener::getPort() const { return port; }
 
 bool ServerListener::Intialize()
 {
@@ -114,7 +114,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 	FD_ZERO(&rfds);
 	FD_SET(client_socket, &rfds);
 
-	int retval = select(client_socket + 1, &rfds, NULL, NULL, &limitTime);
+	int retval = select(client_socket + 1, &rfds, nullptr, nullptr, &limitTime);
 
 	if (!retval || !FD_ISSET(client_socket, &rfds))
 		return;
@@ -213,4 +213,8 @@ bool ServerListener::BindServer(Server& server)
     }
     else
         return false;
+}
+
+ServerListener::ServerListener() : port(0){
+    throw exception();
 }

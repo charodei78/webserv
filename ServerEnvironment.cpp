@@ -4,7 +4,7 @@
 
 #include "ServerEnvironment.hpp"
 
-[[noreturn]] bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
+bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
 {
     if (serverListeners.size() > 0)
     {

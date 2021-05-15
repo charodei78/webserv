@@ -53,13 +53,16 @@ Request *Request::parseQuery(const string &str)
 	vector<string>      parts = split(" ", str);
 	pair<string,string> args;
 
-	if (parts.size() != 3 || parts[0].empty() || parts[1].empty() || parts[2].empty())
+	if (parts[0].empty() || parts[1].empty())
 		throw Http::http_exception(400, "400");
 	query.method = trim(parts[0]);
 	args = split_pair("?" , trim(parts[1]));
 	query.address = args.first;
 	query.query_string = args.second;
-	query.protocol = parts[2].substr(5);
+	if (parts.size() == 3)
+        query.protocol = parts[2].substr(5);
+	else
+	    query.protocol = "1.1";
 	query.protocol = trim(query.protocol);
 	return this;
 }
