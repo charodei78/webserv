@@ -15,7 +15,7 @@ using namespace std;
 class ServerEnvironment
 {
 public:
-    [[noreturn]] bool RunServers(list<Config> &serverConfigs);
+    bool RunServers(list<Config> &serverConfigs);
 
 private:
     vector<ServerListener> serverListeners;

@@ -13,7 +13,7 @@ class ServerListener
         ~ServerListener();
         ServerListener operator=(ServerListener&);
         void ProcessConnectionToServer(sockaddr_in client_addr, int client_socket);
-        int getPort();
+        int getPort() const;
         bool Intialize(); //Привязывается
         void StartListen(); //Начинает прослушивать свой порт
         bool BindServer(Server& server); //Добавляет сервер в лист, на который может быть отправлено соединение
