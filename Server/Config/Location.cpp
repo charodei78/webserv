@@ -3,7 +3,7 @@
 //
 
 #include <vector>
-#include "Helper.hpp"
+#include "../../Helpers/Helper.hpp"
 #include "Location.hpp"
 
 Location::Location(std::string path) : path(path) {}

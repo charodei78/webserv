@@ -4,25 +4,25 @@ project(webserv)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(webserv main.cpp
-        ServerEnvironment.cpp
-        ServerEnvironment.hpp
-        ConfigParser.cpp
-        Config.hpp
-        Config.cpp
-        ConfigParser.hpp
-        Helper.cpp
-        Helper.hpp
+        Server/ServerEnvironment.cpp
+        Server/ServerEnvironment.hpp
+        Server/Config/ConfigParser.cpp
+        Server/Config/Config.hpp
+        Server/Config/Config.cpp
+        Server/Config/ConfigParser.hpp
+        Helpers/Helper.cpp
+        Helpers/Helper.hpp
         ENV.h
         includes.hpp
-        Location.cpp
-        Location.hpp
-        Request.cpp
-        Request.hpp
-        Response.cpp
-        Response.hpp
-        Server.cpp
-        Server.hpp
-        ServerListener.cpp
-        ServerListener.hpp
-        CGIRequest.cpp
-        CGIRequest.hpp http_exception.cpp http_exception.hpp Reader.cpp Reader.hpp)
+        Server/Config/Location.cpp
+        Server/Config/Location.hpp
+        HTTP/Request.cpp
+        HTTP/Request.hpp
+        HTTP/Response.cpp
+        HTTP/Response.hpp
+        Server/Server.cpp
+        Server/Server.hpp
+        Server/ServerListener.cpp
+        Server/ServerListener.hpp
+        HTTP/CGIRequest.cpp
+        HTTP/CGIRequest.hpp exceptions/http_exception.cpp exceptions/http_exception.hpp Helpers/Reader.cpp Helpers/Reader.hpp exceptions/file_not_found_exception.cpp exceptions/file_not_found_exception.hpp exceptions/webserv_exceptions.hpp)

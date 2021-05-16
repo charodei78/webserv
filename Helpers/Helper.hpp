@@ -5,7 +5,7 @@
 #ifndef HELPER_HPP
 #define HELPER_HPP
 
-#include "includes.hpp"
+#include "../includes.hpp"
 #include "dirent.h"
 #include <fstream> // TODO: #include <fstream>
 #include <libc.h>
@@ -17,20 +17,24 @@ pair<string, string> split_pair(string needle, string str);
 
 string file_get_contents(const string& path);
 
-string getTimestamp();
+string to_http_date(time_t const &timeval);
+string get_http_timestamp();
 string getIP(unsigned long ip);
-
-string& ltrim(string& str, const string& chars = "\t\n\v\f\r ");
-string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
-string& trim(string& str, const string& chars = "\t\n\v\f\r ");
-
-int isEmptySpace(int c);
-bool isContain(string str, int(*predicate)(int));
-int pError(string const&program);
 
 bool is_file(string const&path);
 bool is_dir(string const&path);
 bool exists(string const&path);
+string last_modified(string path);
+
+string& ltrim(string& str, const string& chars = "\t\n\v\f\r ");
+string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
+
+string& trim(string& str, const string& chars = "\t\n\v\f\r ");
+int isEmptySpace(int c);
+bool isContain(string str, int(*predicate)(int));
+
+int pError(string const&program);
+
 
 vector<string> *get_dir_content(string const &path);
 

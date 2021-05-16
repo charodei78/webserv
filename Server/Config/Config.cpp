@@ -1,17 +1,17 @@
-#include "Helper.hpp"
+#include "../../Helpers/Helper.hpp"
 #include "Config.hpp"
 
 Config::Config() 
 {
     auth = false;
-    auth_file_path = "../.htpasswd";
-    cgiPath = "../cgi/a.out";
+    auth_file_path = "";
+    cgiPath = "";
     port = 80;
     index = "index.html";
     domain = "localhost";
     ip = "127.0.0.1";
     limitClientBodySize = 1024;
-    rootDirectory = "./";
+    rootDirectory = "/var/www";
 }
 
 Config::~Config(){}

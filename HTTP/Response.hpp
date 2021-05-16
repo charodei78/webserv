@@ -5,11 +5,14 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include "includes.hpp"
+#include "../includes.hpp"
 
 using namespace std;
 
 namespace Http {
+
+	class Request;
+
 	class Response
 	{
 		map<string, string> 	headers;
@@ -33,6 +36,8 @@ namespace Http {
 		string          toString();
 
 		Response *putFile(const string &path);
+
+		Response *attachDefaultHeaders(Config const &config);
 	};
 
 	string get_code_message(unsigned int code);

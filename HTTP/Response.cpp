@@ -45,6 +45,7 @@ Response * Response::putFile(const string &path)
 	try {
 		this->body(file_get_contents(path));
 		this->header("Content-Type", get_mime_type(path));
+		this->header("Last-Modified", last_modified(path));
 	} catch (exception e) {
 		this->code(404);
 	}
@@ -166,6 +167,22 @@ Response &Response::operator=(const string &rhs)
 		response_status_code = 200;
 
 	return *this;
+}
+
+// Retry-After https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Retry-After
+// Location 503 (Service Unavailable), 429 (Too Many Requests), 301 (Moved Permanently)
+
+Response *Response::attachDefaultHeaders(Config const &config)
+{
+	this
+		->header("Server", "ft_webserv")
+		->header("Transfer-Encoding", "identity");
+	if (this->response_status_code == 401)
+		this->header("WWW-Authenticate", "Basic realm=\"Please authenticate\", charset=\"UTF-8\"");
+	if (this->response_status_code == 405)
+		this->header("Allow", config.allowedFunctions);
+
+	return nullptr;
 }
 
 

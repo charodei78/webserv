@@ -3,7 +3,7 @@
 
 #include <list>
 #include "Server.hpp"
-#include "Reader.hpp"
+#include "../Helpers/Reader.hpp"
 #include "sys/stat.h"
 
 class ServerListener

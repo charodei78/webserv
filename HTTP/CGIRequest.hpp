@@ -5,9 +5,9 @@
 #ifndef CGIREQUEST_HPP
 #define CGIREQUEST_HPP
 
-#include "includes.hpp"
+#include "../includes.hpp"
 #include "Request.hpp"
-#include "ENV.h"
+#include "../ENV.h"
 
 using namespace std;
 

@@ -5,7 +5,7 @@
 #ifndef WEBSERV_SERVERENVIRONMENT_H
 #define WEBSERV_SERVERENVIRONMENT_H
 
-#include "Config.hpp"
+#include "Config/Config.hpp"
 #include "ServerListener.hpp"
 #include <vector>
 

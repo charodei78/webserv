@@ -20,11 +20,11 @@
 #include <cstring>
 #include <fcntl.h>
 #include <functional>
-#include "http_exception.hpp"
-#include "Helper.hpp"
-#include "Response.hpp"
-#include "Request.hpp"
-#include "Config.hpp"
-#include "CGIRequest.hpp"
+#include "exceptions/http_exception.hpp"
+#include "Helpers/Helper.hpp"
+#include "HTTP/Response.hpp"
+#include "HTTP/Request.hpp"
+#include "Server/Config/Config.hpp"
+#include "HTTP/CGIRequest.hpp"
 
 #endif //WEBSERV_INCLUDES_HPP

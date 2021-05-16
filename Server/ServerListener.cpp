@@ -2,7 +2,7 @@
 
 void ServerListener::printLog(sockaddr_in client_addr, const string &message = "")
 {
-	cout << "[" << getTimestamp() << "] "
+	cout << "[" << get_http_timestamp() << "] "
 	     << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
 	     << message << endl;
 }
@@ -64,42 +64,41 @@ void ServerListener::StartListen()
         return;
     }
 
+	string error_page;
 
-    printLog(client_addr, "connected");
+	printLog(client_addr, "connected");
     try
     {
         ProcessConnectionToServer(client_addr, client_socket);
+	    close(client_socket);
+	    return;
     }
-    catch (exception &e)
-    {
-    	string error_page;
+    catch (Http::http_exception &e) {
+    string message;
 
-    	try {
-		    Http::http_exception &ex_tmp = (Http::http_exception&)(e);
-		    response.code(ex_tmp.code);
-		    if (ex_tmp.config)
-		        error_page = ex_tmp.config->errorPage;
-		    if (error_page.empty())
-		        error_page = DEFAULT_ERROR_PAGE;
-	    } catch (exception) {
-		    response.code(500);
+	    response.code(e.code);
+	    if (e.config)
+		    error_page = e.config->errorPage;
+	    if (error_page.empty())
 		    error_page = DEFAULT_ERROR_PAGE;
-	    }
-	    try {
-		    response.putFile(error_page);
-	    } catch (exception &e) {
-	    	cerr << e.what() << endl;
-	    }
-	    string message = e.what();
-	    printLog(client_addr,  message);
-	    string resStr = response.toString();
-	    int result = send(client_socket, resStr.data(), resStr.length(), MSG_DONTWAIT);
-	    if (result == -1) {
-		    // sending failed
-		    cerr << "send failed: " << errno << endl;
-	    }
+	    printLog(client_addr,  e.what());
+	    response.attachDefaultHeaders(*e.config);
+    } catch (exception &e) {
+	    response.code(500);
+	    printLog(client_addr,  e.what());
+	    error_page = DEFAULT_ERROR_PAGE;
     }
-    close(client_socket);
+    try {
+	    response.putFile(error_page);
+    } catch (exception &e) {
+        cerr << e.what() << endl;
+    }
+    string resStr = response.toString();
+    int result = send(client_socket, resStr.data(), resStr.length(), MSG_DONTWAIT);
+    if (result == -1) {
+	    // sending failed
+	    cerr << "send failed: " << errno << endl;
+    }
 }
 
 

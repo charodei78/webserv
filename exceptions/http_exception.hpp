@@ -7,7 +7,7 @@
 
 #include <exception>
 #include <string>
-#include "Config.hpp"
+#include "../Server/Config/Config.hpp"
 
 using namespace std;
 
@@ -20,6 +20,8 @@ namespace Http {
 		Config *config;
 
 		http_exception(int code, string what = "", Config *config = nullptr);
+		http_exception &operator=(http_exception const& rhs);
+		~http_exception();
 		const char * what() const noexcept override;
 	};
 };

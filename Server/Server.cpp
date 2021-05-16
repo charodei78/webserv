@@ -2,7 +2,7 @@
 
 void Server::printLog(sockaddr_in client_addr, const string &message = "")
 {
-	cout << "[" << getTimestamp() << "] "
+	cout << "[" << get_http_timestamp() << "] "
 	     << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
 	     << message << endl;
 }
@@ -145,6 +145,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 			throw Http::http_exception(403, request->getLog(403), config);
 	}
 
+	response.attachDefaultHeaders(*config);
 	string resStr = response.toString();
 	result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
 	if (result == -1) {

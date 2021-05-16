@@ -1,10 +1,10 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "Config.hpp"
-#include "Location.hpp"
-#include "Response.hpp"
-#include "includes.hpp"
+#include "Config/Config.hpp"
+#include "Config/Location.hpp"
+#include "../HTTP/Response.hpp"
+#include "../includes.hpp"
 
 using namespace std;
 

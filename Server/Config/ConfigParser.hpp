@@ -5,7 +5,7 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include "includes.hpp"
+#include "../../includes.hpp"
 #include <list>
 #include "Config.hpp"
 

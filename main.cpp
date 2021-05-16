@@ -1,5 +1,5 @@
-#include "ConfigParser.hpp"
-#include "ServerEnvironment.hpp"
+#include "Server/Config/ConfigParser.hpp"
+#include "Server/ServerEnvironment.hpp"
 
 int main(int argc, char **argv)
 {
@@ -32,8 +32,13 @@ int main(int argc, char **argv)
 
      ConfigParser parser;
 
-        list<Config> testConfigs = parser.GetServerConfigs("../test2.conf");
-        ServerEnvironment env;
-        env.RunServers(testConfigs);
+     try {
+	     list<Config> testConfigs = parser.GetServerConfigs("../conf/test2.conf");
+	     ServerEnvironment env;
+	     env.RunServers(testConfigs);
+     } catch (exception &e) {
+	     cerr << e.what() ;
+     }
+
 
 }

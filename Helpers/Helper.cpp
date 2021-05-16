@@ -3,6 +3,7 @@
 //
 
 #include "Helper.hpp"
+#include "../exceptions/file_not_found_exception.hpp"
 
 vector<string> split(string needle, string str)
 {
@@ -51,23 +52,30 @@ string file_get_contents(const string& path)
 {
     std::ifstream t(path);
     if (!t)
-        throw exception();
+        throw file_not_found_exception();
     std::string str((std::istreambuf_iterator<char>(t)),
                     std::istreambuf_iterator<char>());
     return str;
 }
 
-string getTimestamp()
+string to_http_date(time_t const &timeval)
 {
 	char        buffer[256] = "";
 	tm          *time;
+
+	time = localtime(&timeval);
+	mktime(time);
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", time);
+	return buffer;
+}
+
+string get_http_timestamp()
+{
 	timeval     timeval = {};
 
 	gettimeofday(&timeval, nullptr);
-	time = localtime(&timeval.tv_sec);
-	mktime(time);
-	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", time);
-	return string(buffer);
+
+	return to_http_date(timeval.tv_sec);
 }
 
 string getIP(unsigned long ip)
@@ -80,6 +88,15 @@ string getIP(unsigned long ip)
 	result += to_string(ip >> 16 & 0xFF) + '.';
 	result += to_string(ip >> 24 & 0xFF);
 	return result;
+}
+
+string last_modified(string path)
+{
+	struct stat buf{};
+
+	if (stat(path.c_str(), &buf) == -1)
+		return "";
+	return to_http_date(buf.st_ctimespec.tv_sec);
 }
 
 int IsEmptySpace(int c)
