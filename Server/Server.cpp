@@ -92,10 +92,11 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 {
 	int result;
 	string message;
+	string path;
 	Http::Response response;
 
 	if (request->query.method == "PUT") {
-		string path = config->rootDirectory + request->query.address;
+		path = config->rootDirectory + request->query.address;
 		bool file_exists = exists(path);
 		if (file_put_contents(path, request->body, 0666) == -1) {
 			response.code(404);
@@ -109,7 +110,7 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		}
 	}
 	else {
-		string path = serverConfig.getIndexPath(request->query.address);
+		path = serverConfig.getIndexPath(request->query.address);
 
 		if (path.empty())
 			throw Http::http_exception(404, request->getLog(404), config);
@@ -144,8 +145,9 @@ bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Req
 		else
 			throw Http::http_exception(403, request->getLog(403), config);
 	}
+	if (!config->isCGI(path))
+		response.attachDefaultHeaders(*config);
 
-	response.attachDefaultHeaders(*config);
 	string resStr = response.toString();
 	result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
 	if (result == -1) {

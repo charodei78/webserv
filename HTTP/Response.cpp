@@ -176,7 +176,8 @@ Response *Response::attachDefaultHeaders(Config const &config)
 {
 	this
 		->header("Server", "ft_webserv")
-		->header("Transfer-Encoding", "identity");
+		->header("Transfer-Encoding", "identity")
+		->header("Date", get_http_timestamp());
 	if (this->response_status_code == 401)
 		this->header("WWW-Authenticate", "Basic realm=\"Please authenticate\", charset=\"UTF-8\"");
 	if (this->response_status_code == 405)
