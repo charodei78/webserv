@@ -16,7 +16,7 @@ using namespace std;
 class ServerCluster
 {
 public:
-    bool RunServers();
+    bool RunServers(); //основной цикл
     explicit ServerCluster(list<Config> &serverConfigs);
 private:
     void intializeServerListeners();

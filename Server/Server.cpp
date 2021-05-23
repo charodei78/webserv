@@ -163,7 +163,3 @@ Server::Server()
 {
 
 }
-
-Server *Server::GetServerLocation(string path) {
-    return nullptr;
-}
