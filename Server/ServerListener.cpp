@@ -224,3 +224,7 @@ bool ServerListener::BindServer(Server& server)
 ServerListener::ServerListener() : port(0){
     throw exception();
 }
+
+int ServerListener::getSock() {
+    return sock;
+}
