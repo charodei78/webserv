@@ -7,6 +7,7 @@
 Client::Client(int sock) : sock(sock)
 {
     currentState = requestParsing;
+    time(&lastOperationTime);
 }
 
 int Client::getSock() {

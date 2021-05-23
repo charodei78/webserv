@@ -75,8 +75,8 @@ bool ServerCluster::RunServers()
                 //Нужно ли читать и есть ли что читать
                 if (clientIter->currentState == requestParsing && FD_ISSET(clientIter->getSock(), &readSet))
                 {
-                    int ret = clientIter->readRequest();
-                    if (ret <= 0)
+                    int res = clientIter->readRequest();
+                    if (res <= 0)
                         closeClientConnection(*listenerIter, clientIter);
 
                     if (clientIter->currentState == sendingResponse)
@@ -89,8 +89,8 @@ bool ServerCluster::RunServers()
                 //Запись, если есть куда писать и нужно ли ему писать
                 if (clientIter->currentState == sendingResponse && FD_ISSET(clientIter->getSock(), &writeSet))
                 {
-                    int ret = clientIter->sendResponse();
-                    if (ret <= 0)
+                    int res = clientIter->sendResponse();
+                    if (res <= 0)
                         closeClientConnection(*listenerIter, clientIter);
 
                 }

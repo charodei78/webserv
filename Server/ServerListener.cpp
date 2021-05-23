@@ -38,10 +38,8 @@ bool ServerListener::Intialize()
         return false;
     }
 
-    if (listen(sock, 10) < 0)
+    if (listen(sock, 50) < 0)
         return false;
-
-    fcntl(sock, F_SETFL, O_NONBLOCK);
 
 	cout << "Listener with " << port << " ready to listen\n";
 	return true;
@@ -227,4 +225,19 @@ ServerListener::ServerListener() : port(0){
 
 int ServerListener::getSock() {
     return sock;
+}
+
+Client &ServerListener::acceptClient() {
+    sockaddr_in client_addr;
+
+    int addrlen = sizeof(client_addr);
+
+    int client_socket = accept(sock, (struct sockaddr *) &client_addr,
+                               reinterpret_cast<socklen_t *>(&addrlen));
+
+    fcntl(client_socket, F_SETFL, O_NONBLOCK);
+
+    Client newClient(client_socket);
+
+    return newClient;
 }
