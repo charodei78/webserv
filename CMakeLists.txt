@@ -4,8 +4,8 @@ project(webserv)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(webserv main.cpp
-        Server/ServerEnvironment.cpp
-        Server/ServerEnvironment.hpp
+        Server/ServerCluster.cpp
+        Server/ServerCluster.hpp
         Server/Config/ConfigParser.cpp
         Server/Config/Config.hpp
         Server/Config/Config.cpp

@@ -9,6 +9,8 @@
 #define OPERATION_BYTE_SIZE 32768
 
 #include "Server.hpp"
+#include "../HTTP/Request.hpp"
+#include "ctime"
 
 enum state
         {
@@ -27,7 +29,9 @@ private:
     string sendBuffer;
 public:
     state currentState;
-    Client(int sock);
+    time_t lastOperationTime;
+
+    explicit Client(int sock);
     int getSock();
     int readRequest();
     int sendResponse();

@@ -2,9 +2,10 @@
 // Created by Harren Leilani on 5/3/21.
 //
 
-#include "ServerEnvironment.hpp"
+#include "ServerCluster.hpp"
 
-bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
+
+bool ServerCluster::RunServers()
 {
     if (serverListeners.size() > 0)
     {
@@ -15,35 +16,7 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
     if (serverConfigs.size() == 0)
         return false;
 
-    list<Config>::iterator  configIter = serverConfigs.begin();
-    while (configIter != serverConfigs.end())
-    {
-        Server newServer(*configIter);
-
-        vector<ServerListener>::iterator listenerIter = serverListeners.begin();
-
-        while (listenerIter != serverListeners.end())
-        {
-            if (listenerIter->getPort() == configIter->port)
-                break;
-            listenerIter++;
-        }
-
-        if (listenerIter == serverListeners.end())
-        {
-            ServerListener newListener(configIter->port);
-            newListener.BindServer(newServer);
-            serverListeners.push_back(newListener);
-        }
-        else
-            listenerIter->BindServer(newServer);
-        configIter++;
-    }
-
-    fd_set readMasterSet;
-    fd_set writeMasterSet;
-
-    max_fd = 0;
+    intializeServerListeners();
 
     vector<ServerListener>::iterator listenerIter = serverListeners.begin();
     while (listenerIter != serverListeners.end()) {
@@ -55,10 +28,6 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
             max_fd = listenerIter->getSock();
         listenerIter++;
     }
-
-    timeval timeoutMaster;
-    timeoutMaster.tv_usec = 0;
-    timeoutMaster.tv_sec = 2;
 
     vector<Client>::iterator clientIter;
     while (true)
@@ -96,6 +65,9 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
                 }
             }
 
+            time_t currentTime;
+            time(&currentTime);
+
             //Проход по каждому клиенту этого сервака
             clientIter = listenerIter->clients.begin();
             while (clientIter != listenerIter->clients.end())
@@ -103,12 +75,9 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
                 //Нужно ли читать и есть ли что читать
                 if (clientIter->currentState == requestParsing && FD_ISSET(clientIter->getSock(), &readSet))
                 {
-                    if (clientIter->readRequest() <= 0){
-                        //Закрыто соединение
-                        FD_CLR(clientIter->getSock(), &readMasterSet);
-                        listenerIter->clients.erase(clientIter);
-                        close(clientIter->getSock());
-                    }
+                    int ret = clientIter->readRequest();
+                    if (ret <= 0)
+                        closeClientConnection(*listenerIter, clientIter);
 
                     if (clientIter->currentState == sendingResponse)
                     {
@@ -120,21 +89,17 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
                 //Запись, если есть куда писать и нужно ли ему писать
                 if (clientIter->currentState == sendingResponse && FD_ISSET(clientIter->getSock(), &writeSet))
                 {
-                    if (clientIter->sendResponse() <= 0)
-                    {
-                        //Закрылось соединение
-                        FD_CLR(clientIter->getSock(), &writeMasterSet);
-                        listenerIter->clients.erase(clientIter);
-                        close(clientIter->getSock());
-                    }
+                    int ret = clientIter->sendResponse();
+                    if (ret <= 0)
+                        closeClientConnection(*listenerIter, clientIter);
 
-                    if (clientIter->currentState == closeConnection)
-                    {
-                        FD_CLR(clientIter->getSock(), &writeMasterSet);
-                        listenerIter->clients.erase(clientIter);
-                        close(clientIter->getSock());
-                    }
                 }
+
+                if (clientIter->currentState == closeConnection)
+                    closeClientConnection(*listenerIter, clientIter);
+
+                if (difftime(currentTime, clientIter->lastOperationTime) > OPERATION_TIMEOUT)
+                    closeClientConnection(*listenerIter, clientIter);
 
                 clientIter++;
             }
@@ -142,4 +107,52 @@ bool ServerEnvironment::RunServers(list<Config> &serverConfigs)
             listenerIter++;
         }
     }
+}
+
+ServerCluster::ServerCluster(list<Config> &serverConfigs) {
+    max_fd = 0;
+
+    FD_ZERO(&readMasterSet);
+    FD_ZERO(&writeMasterSet);
+
+    timeoutMaster.tv_usec = 0;
+    timeoutMaster.tv_sec = 2;
+
+    this->serverConfigs = serverConfigs;
+}
+
+void ServerCluster::intializeServerListeners() {
+    list<Config>::iterator  configIter = serverConfigs.begin();
+    while (configIter != serverConfigs.end())
+    {
+        Server newServer(*configIter);
+
+        vector<ServerListener>::iterator listenerIter = serverListeners.begin();
+
+        while (listenerIter != serverListeners.end())
+        {
+            if (listenerIter->getPort() == configIter->port)
+                break;
+            listenerIter++;
+        }
+
+        if (listenerIter == serverListeners.end())
+        {
+            ServerListener newListener(configIter->port);
+            newListener.BindServer(newServer);
+            serverListeners.push_back(newListener);
+        }
+        else
+            listenerIter->BindServer(newServer);
+        configIter++;
+    }
+}
+
+void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client>::iterator &clientIter) {
+    if (FD_ISSET(clientIter->getSock(), &writeMasterSet))
+        FD_CLR(clientIter->getSock(), &writeMasterSet);
+    if (FD_ISSET(clientIter->getSock(), &readMasterSet))
+        FD_CLR(clientIter->getSock(), &readMasterSet);
+    listener.clients.erase(clientIter);
+    close(clientIter->getSock());
 }

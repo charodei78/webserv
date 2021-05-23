@@ -23,11 +23,11 @@ class ServerListener
         bool BindServer(Server& server); //Добавляет сервер в лист, на который может быть отправлено соединение
         Client &acceptClient();
         vector<Client> clients;
+        Server &FindServerByHost(std::string host);
 private:
     int sock;
     const int port;
-        static void printLog(sockaddr_in client_addr, const string &message);
-        Server &FindServerByHost(std::string host);
+    static void printLog(sockaddr_in client_addr, const string &message);
         ServerListener();
         std::list<Server> servers;
 };
