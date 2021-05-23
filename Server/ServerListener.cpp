@@ -114,7 +114,7 @@ void ServerListener::ProcessConnectionToServer(sockaddr_in client_addr, int clie
 
 	fd_set rfds;
 	timeval limitTime;
-	limitTime.tv_sec = 2;
+	limitTime.tv_sec = 10;
 	limitTime.tv_usec = 0;
 
 	Http::Request request;

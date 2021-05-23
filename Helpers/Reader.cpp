@@ -8,15 +8,17 @@ using namespace std;
 
 string Reader::readBefore(int fd, string const &needle, unsigned buf_size)
 {
-	string  result;
-	string  tmp;
-	long     n_pos = -1;
-	char    *buf = new char[buf_size + 1]{0};
+	string      result;
+	string      tmp;
+	long        n_pos = -1;
+	char        *buf = new char[buf_size + 1]{0};
+	int             error;
+	int         counter = 0;
 
 	while (true)
 	{
 		if (storage.empty()) {
-			if (read(fd, buf, buf_size) < 0) {
+			if ((error = read(fd, buf, buf_size)) < 0) {
 				pError("read");
 				delete[] buf;
 				throw exception();
