@@ -21,6 +21,7 @@ Request::Request(const string &request)
 		throw Http::http_exception(400, "400");
 
 	query_string = message.first.substr(0, pos - 1);
+
 	parseQuery(query_string);
 
 	headers_string = message.first.substr(pos + 1);
@@ -55,6 +56,7 @@ Request *Request::parseQuery(const string &str)
 
 	if (parts[0].empty() || parts[1].empty())
 		throw Http::http_exception(400, "400");
+    query.is_set = true;
 	query.method = trim(parts[0]);
 	args = split_pair("?" , trim(parts[1]));
 	query.address = args.first;

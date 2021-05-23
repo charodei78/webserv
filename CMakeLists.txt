@@ -9,8 +9,12 @@ add_executable(webserv main.cpp
         Server/Config/ConfigParser.cpp
         Server/Config/Config.hpp
         Server/Config/Config.cpp
+        Server/Client.hpp
+        Server/Client.cpp
         Server/Config/ConfigParser.hpp
         Helpers/Helper.cpp
+        Helpers/Reader.cpp
+        Helpers/Reader.hpp
         Helpers/Helper.hpp
         ENV.h
         includes.hpp
@@ -25,4 +29,4 @@ add_executable(webserv main.cpp
         Server/ServerListener.cpp
         Server/ServerListener.hpp
         HTTP/CGIRequest.cpp
-        HTTP/CGIRequest.hpp exceptions/http_exception.cpp exceptions/http_exception.hpp Helpers/Reader.cpp Helpers/Reader.hpp exceptions/file_not_found_exception.cpp exceptions/file_not_found_exception.hpp exceptions/webserv_exceptions.hpp)
+        HTTP/CGIRequest.hpp exceptions/http_exception.cpp exceptions/http_exception.hpp exceptions/file_not_found_exception.cpp exceptions/file_not_found_exception.hpp exceptions/webserv_exceptions.hpp)

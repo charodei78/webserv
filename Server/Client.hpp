@@ -9,8 +9,10 @@
 #define OPERATION_BYTE_SIZE 32768
 
 #include "Server.hpp"
+#include "../Helpers/Reader.hpp"
 #include "../HTTP/Request.hpp"
 #include "ctime"
+#include "ServerListener.hpp"
 
 enum state
         {
@@ -19,7 +21,13 @@ enum state
     closeConnection
         };
 
+class ServerListener;
+
 using namespace std;
+
+#ifndef READ_SIZE
+#define READ_SIZE 32768
+#endif
 
 class Client {
 private:
@@ -27,14 +35,21 @@ private:
     const int sock;
     string readBuffer;
     string sendBuffer;
+    Reader *reader;
 public:
-    state currentState; //Как необходимо сейчас работать с этим клиентом
-    time_t lastOperationTime; //Во избежании простаивания или зависания клиентов и их накопления запоминаем когда в последней раз они откликались
-
-    explicit Client(int sock);
+    state currentState;
+    Server *server;
+    Http::Request request;
+    Http::Response response;
+    Client &operator=(const Client &src);
+    Client(const Client&);
+    int onError(int code);
+    int readRequest(ServerListener &listener, int socket, sockaddr_in addr);
+    Client(int sock);
+    time_t lastOperationTime;
     int getSock();
-    int readRequest(); //Чтение запроса с сокета клиента (вызов = можно читать)
-    int sendResponse(); //Отправка ответа клиенту (вызов = можно писать)
+    int sendResponse();
+    int readRequest();
 };
 
 

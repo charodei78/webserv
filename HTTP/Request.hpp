@@ -11,12 +11,19 @@ using namespace std;
 
 namespace Http {
 
-	struct query_s {
-		string method;
-		string address;
-		string query_string;
-		string protocol;
-	};
+    struct query_s {
+        string  method;
+        string  address;
+        string  query_string;
+        string  protocol;
+        bool    is_set;
+        query_s():method(""),
+                  address(""),
+                  query_string(""),
+                  protocol(""),
+                  is_set(false)
+        {};
+    };
 
 	class Request
 	{

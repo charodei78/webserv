@@ -13,16 +13,18 @@
 class Reader
 {
 	string storage;
-	Reader(Reader const &rhs);
-	Reader &operator=(Reader const &rhs);
 public:
 	Reader();
 	~Reader();
+	bool    reedUsed;
 
-	string  readLine(int fd, unsigned buf_size = 128);
-	string  readBefore(int fd, string const &needle, unsigned buf_size = 256);
-	string  readFull(int fd);
-	string  readCount(int fd, unsigned long count);
+	Reader(Reader const &rhs);
+	Reader &operator=(Reader const &rhs);
+
+	int     readLine(string &result, int fd, unsigned buf_size = 128);
+	int     readBefore(string &result, int fd, string const &needle, unsigned buf_size = 256);
+//	int     readOne(string &result, int fd);
+	int     readCount(string &result, unsigned long count, int fd);
 	void    clearStorage();
 
 };

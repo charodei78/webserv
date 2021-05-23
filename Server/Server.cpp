@@ -2,9 +2,9 @@
 
 void Server::printLog(sockaddr_in client_addr, const string &message = "")
 {
-	cout << "[" << get_http_timestamp() << "] "
-	     << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
-	     << message << endl;
+    cout << "[" << get_http_timestamp() << "] "
+         << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
+         << message << endl;
 }
 
 Server::Server(Config config) : serverConfig(config)
@@ -88,75 +88,61 @@ Server &Server::GetLocationServer(const string &uri)
     return *this;
 }
 
-bool Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config)
+Http::Response Server::SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config)
 {
-	int result;
-	string message;
-	string path;
-	Http::Response response;
-
-	if (request->query.method == "PUT") {
-		path = config->rootDirectory + request->query.address;
-		bool file_exists = exists(path);
-		if (file_put_contents(path, request->body, 0666) == -1) {
-			response.code(404);
-		}
-		else {
-			if (file_exists)
-				response.code(204);
-			else
-				response.code(201);
-			response.header("Content-Location", request->query.address);
-		}
-	}
-	else {
-		path = serverConfig.getIndexPath(request->query.address);
-
-		if (path.empty())
-			throw Http::http_exception(404, request->getLog(404), config);
-
-		if (is_file(path)) {
-			if (config->isCGI(path))
-			{
-				CGIRequest  cgiRequest(*request, serverConfig, addr);
-				response = cgiRequest.makeQuery(request->body);
-			} else {
-				response.putFile(path);
-			}
-		}
-		else if (config->autoindex)
-		{
-			vector<string> *dirs = get_dir_content(path);
-			string body;
-
-			if (dirs == nullptr)
-				throw Http::http_exception(500, request->getLog(500), config);
-
-			string webPath = "<a href=\"" + request->query.address;
-			if (*(--request->query.address.end()) != '/')
-				webPath += '/';
-			for (int i = 0; i < dirs->size(); i++) {
-				body += webPath + (*dirs)[i] + "\">" + (*dirs)[i] + "</a><br>" ;
-			}
-			response.body(body);
-			response.header("Content-Type", "text/html");
-			delete dirs;
-		}
-		else
-			throw Http::http_exception(403, request->getLog(403), config);
-	}
-	if (!config->isCGI(path))
-		response.attachDefaultHeaders(*config);
-
-	string resStr = response.toString();
-	result = send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
-	if (result == -1) {
-		// sending failed
-		cerr << "send failed" << endl;
-	}
-	printLog(addr, request->getLog(response.code()));
-
-	return true;
+    int result;
+    string message;
+    string path;
+    Http::Response response;
+    if (request->query.method == "PUT") {
+        path = config->rootDirectory + request->query.address;
+        bool file_exists = exists(path);
+        if (file_put_contents(path, request->body, 0666) == -1) {
+            response.code(404);
+        }
+        else {
+            if (file_exists)
+                response.code(204);
+            else
+                response.code(201);
+            response.header("Content-Location", request->query.address);
+        }
+    }
+    else {
+        path = serverConfig.getIndexPath(request->query.address);
+        if (path.empty())
+            return *response.code(404);
+        if (is_file(path)) {
+            if (config->isCGI(path))
+            {
+                CGIRequest  cgiRequest(*request, serverConfig, addr);
+                response = cgiRequest.makeQuery(request->body);
+                return response;
+            } else {
+                response.putFile(path);
+            }
+        }
+        else if (config->autoindex)
+        {
+            vector<string> *dirs = get_dir_content(path);
+            string body;
+            if (dirs == nullptr)
+                return *response.code(500);
+            string webPath = "<a href=\"" + request->query.address;
+            if (*(--request->query.address.end()) != '/')
+                webPath += '/';
+            for (int i = 0; i < dirs->size(); i++) {
+                body += webPath + (*dirs)[i] + "\">" + (*dirs)[i] + "</a><br>" ;
+            }
+            response.body(body);
+            response.header("Content-Type", "text/html");
+            delete dirs;
+        }
+        else
+            return *response.code(403);
+    }
+    response.attachDefaultHeaders(*config);
+    return response;
 }
 
 Server::Server()

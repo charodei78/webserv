@@ -34,8 +34,8 @@ int main(int argc, char **argv)
 
      try {
 	     list<Config> testConfigs = parser.GetServerConfigs("../conf/eval.conf");
-	     ServerCluster env;
-	     env.RunServers(testConfigs);
+	     ServerCluster env(testConfigs);
+	     env.RunServers();
      } catch (exception &e) {
 	     cerr << e.what() ;
      }

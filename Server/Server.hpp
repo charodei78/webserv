@@ -25,7 +25,7 @@ class Server
         Server &GetLocationServer(const string &uri); //если есть локейшины, попробует найти его по uri
         string GetServerName(); //alternative: host
         void SendAuthorizationRequest(const sockaddr_in &addr, const int sock); //TODO: заменить
-        bool SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config); //TODO: заменить
+        Http::Response SendHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config); //TODO: заменить
         static void printLog(sockaddr_in client_addr, const string& message);
 };
 
