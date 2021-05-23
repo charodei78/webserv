@@ -27,6 +27,9 @@ bool ServerListener::Intialize()
 	addr.sin_family = AF_INET;
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
+    int opt = 1;
+    setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(const char *)&opt,sizeof(int));
+
 	//Проверка удалось ли инициализировать сокет
 	if (sock < 0) {
 		cerr << strerror(errno);
@@ -100,7 +103,7 @@ Client ServerListener::acceptClient() {
 
     fcntl(client_socket, F_SETFL, O_NONBLOCK);
 
-    Client newClient(client_socket);
+    Client newClient(client_socket, client_addr);
 
     return newClient;
 }

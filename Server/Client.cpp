@@ -4,9 +4,12 @@
 
 #include "Client.hpp"
 
-Client::Client(int sock) : sock(sock)
+Client::Client(int sock, sockaddr_in addr)
 {
     currentState = requestParsing;
+    reader = new Reader();
+    this->sock = sock;
+    this->addr = addr;
     time(&lastOperationTime);
 }
 
@@ -28,7 +31,7 @@ int Client::onError(int code)
     currentState = sendingResponse;
     return 1;
 }
-int Client::readRequest(ServerListener &listener, int socket, sockaddr_in addr)
+int Client::readRequest(ServerListener &listener, int socket)
 {
     string result;
     Config *config;
@@ -123,14 +126,21 @@ int Client::readRequest(ServerListener &listener, int socket, sockaddr_in addr)
 
 Client &Client::operator=(const Client &src) {
     this->lastOperationTime = src.lastOperationTime;
-
+    this->sock = src.sock;
+    this->request = src.request;
+    this->response = src.response;
+    this->currentState = src.currentState;
+    this->readBuffer = src.readBuffer;
+    this->sendBuffer = src.sendBuffer;
+    this->attachedServer = src.attachedServer;
+    this->addr = src.addr;
     return *this;
 }
 
-int Client::readRequest() {
-    return 0;
+Client::Client(const Client &c) {
+    *this = c;
 }
 
-Client::Client(const Client &c) : sock(c.sock) {
-
+Client::~Client() {
+    delete reader;
 }

@@ -32,7 +32,8 @@ using namespace std;
 class Client {
 private:
     Server attachedServer;
-    const int sock;
+    sockaddr_in addr;
+    int sock;
     string readBuffer;
     string sendBuffer;
     Reader *reader;
@@ -43,9 +44,10 @@ public:
     Http::Response response;
     Client &operator=(const Client &src);
     Client(const Client&);
+    ~Client();
     int onError(int code);
-    int readRequest(ServerListener &listener, int socket, sockaddr_in addr);
-    Client(int sock);
+    int readRequest(ServerListener &listener, int socket);
+    Client(int sock, sockaddr_in addr);
     time_t lastOperationTime;
     int getSock();
     int sendResponse();

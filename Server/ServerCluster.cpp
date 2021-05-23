@@ -75,7 +75,7 @@ bool ServerCluster::RunServers()
                 //Нужно ли читать и есть ли что читать
                 if (clientIter->currentState == requestParsing && FD_ISSET(clientIter->getSock(), &readSet))
                 {
-                    int res = clientIter->readRequest();
+                    int res = clientIter->readRequest(*listenerIter, clientIter->getSock());
                     if (res <= 0)
                         closeClientConnection(*listenerIter, clientIter);
 
