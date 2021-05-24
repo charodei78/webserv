@@ -9,6 +9,7 @@ Client::Client(int sock, sockaddr_in addr)
     currentState = requestParsing;
     reader = new Reader();
     this->sock = sock;
+	this->config = nullptr;
     this->server = nullptr;
     this->addr = addr;
     time(&lastOperationTime);
@@ -28,17 +29,18 @@ int Client::sendResponse() {
 
 int Client::onError(int code)
 {
-    request.getLog(code);
+    Server::printLog(addr, request.getLog(code));
     response.code(code);
     if (code != 505)
         response.attachDefaultHeaders(this->server->serverConfig);
+
+
     currentState = sendingResponse;
     return 1;
 }
 int Client::readRequest(ServerListener &listener)
 {
     string result;
-    Config *config;
     int status;
     int read_count;
     int BodyLimit;
@@ -79,14 +81,11 @@ int Client::readRequest(ServerListener &listener)
         }
         if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == -1)
             return onError(405);
-//    if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == -1)
-//       throw Http::http_exception(405, request.getLog(405), config);
+
         if (request.headers.count("Content-Length"))
             if (stoi(request.headers["Content-Length"]) > BodyLimit)
                 return onError(405);
-//    if (request.headers.count("Content-Length"))
-//       if (stoi(request.headers["Content-Length"]) > BodyLimit)
-//          throw Http::http_exception(413, request.getLog(413), config);
+
     }
     // Body
     if (request.headers["Transfer-Encoding"] == "chunked") {
@@ -116,7 +115,8 @@ int Client::readRequest(ServerListener &listener)
         response = server->SendHttpResponse(addr, sock, &request, config);
         if (response.code() >= 200 && response.code() < 300) {
             currentState = sendingResponse;
-            return 1;
+	        Server::printLog(addr, request.getLog(response.code()));
+	        return 1;
         }
         onError(response.code());
     } catch (exception &e) {

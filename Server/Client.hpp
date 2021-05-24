@@ -37,8 +37,9 @@ private:
     string readBuffer;
     string sendBuffer;
     Reader *reader;
+	Config *config;
 
-    Client();
+	Client();
 public:
     state currentState;
     Server *server;

@@ -140,6 +140,7 @@ Config &Config::operator=(Config const &rhs)
 		this->cgiPath = rhs.cgiPath;
 		this->index = rhs.index;
 		this->errorPage = rhs.errorPage;
+		this->autoindex = rhs.autoindex;
 		this->allowedFunctions = rhs.allowedFunctions;
 		this->port = rhs.port;
 		this->limitClientBodySize = rhs.limitClientBodySize;

@@ -33,7 +33,7 @@ int main(int argc, char **argv)
      ConfigParser parser;
 
      try {
-	     list<Config> testConfigs = parser.GetServerConfigs("../conf/test2.conf");
+	     list<Config> testConfigs = parser.GetServerConfigs("../conf/eval.conf");
 	     ServerCluster env(testConfigs);
 	     env.RunServers();
      } catch (exception &e) {

@@ -183,7 +183,18 @@ Response *Response::attachDefaultHeaders(Config const &config)
 	if (this->response_status_code == 405)
 		this->header("Allow", config.allowedFunctions);
 
-	return nullptr;
+	if (this->response_status_code < 200 || this->response_status_code >= 300) {
+		try {
+			if (config.errorPage.empty())
+				putFile(DEFAULT_ERROR_PAGE);
+			else
+				putFile(config.errorPage);
+		} catch (exception &e) {
+			cerr << e.what() << endl;
+		}
+	}
+
+	return this;
 }
 
 
