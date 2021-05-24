@@ -15,22 +15,20 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
 	int         counter = 0;
 
 
-	if (storage.empty()) {
-		if (reedUsed)
-			return 1;
+	if (storage.empty() || (n_pos = storage.find(needle)) == -1) {
+        if (reedUsed)
+            return 1;
 		if ((error = read(fd, buf, buf_size)) < 0) {
 			pError("read");
 			delete[] buf;
 			return -1;
 		}
 		reedUsed = true;
-		storage = buf;
+		storage += buf;
 		delete[] buf;
 	}
-	n_pos = storage.find(needle);
-	if (n_pos == -1)
-		return 1;
 
+    n_pos = storage.find(needle);
 	result = storage.substr(0, n_pos);
     storage = storage.substr(n_pos + needle.length());
 	return 0;
