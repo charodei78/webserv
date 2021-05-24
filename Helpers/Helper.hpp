@@ -15,7 +15,11 @@ using namespace std;
 vector<string> split(string needle, string str);
 pair<string, string> split_pair(string needle, string str);
 
-string file_get_contents(const string& path);
+string  file_get_contents(const string& path);
+int     create_dir(string path, int rights = 0777);
+int     file_put_contents(string filename, const string &data, int rights = 0777);
+int     file_put_contents(string filename, int fd, int rights = 0777);
+
 
 string to_http_date(time_t const &timeval);
 string get_http_timestamp();
@@ -37,9 +41,6 @@ int pError(string const&program);
 
 
 vector<string> *get_dir_content(string const &path);
-
-int     create_dir(string path, int rights = 0777);
-int file_put_contents(string filename, const string &data, int rights = 0777);
 
 string  abs_path(string path);
 

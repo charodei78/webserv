@@ -97,7 +97,13 @@ Http::Response Server::SendHttpResponse(const sockaddr_in &addr, const int sock,
     if (request->query.method == "PUT") {
         path = config->rootDirectory + request->query.address;
         bool file_exists = exists(path);
-        if (file_put_contents(path, request->body, 0666) == -1) {
+		int result;
+
+        if (request->file_fd)
+	        result = file_put_contents(path, request->file_fd, 0666);
+        else
+	        result = file_put_contents(path, request->body, 0666);
+        if (result == -1) {
             response.code(404);
         }
         else {

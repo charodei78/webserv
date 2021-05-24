@@ -28,13 +28,19 @@ int Client::sendResponse() {
     return 1;
 }
 
+int Client::checkStatus(int status)
+{
+	if (status == -1)
+		return onError(500);
+	return status;
+}
+
 int Client::onError(int code)
 {
     Server::printLog(addr, request.getLog(code));
     response.code(code);
     if (code != 505)
         response.attachDefaultHeaders(this->server->serverConfig);
-
 
     currentState = sendingResponse;
     return 1;
@@ -51,7 +57,7 @@ int Client::readRequest(ServerListener &listener)
     if (!request.query.is_set) {
         status = reader->readLine(result, sock, READ_SIZE * 2);
         if (status)
-            return status;
+            return checkStatus(status);
         request.parseQuery(result);
         if (request.query.protocol != "1.1")
             return onError(505);
@@ -60,7 +66,7 @@ int Client::readRequest(ServerListener &listener)
     if (request.headers.empty()) {
         status = reader->readBefore(result, sock, "\r\n\r\n", READ_SIZE);
         if (status)
-            return status;
+            return checkStatus(status);
         // TODO: max size 413
         request.parseHeaders(result);
         if (!this->server) {
@@ -92,26 +98,40 @@ int Client::readRequest(ServerListener &listener)
     if (request.headers["Transfer-Encoding"] == "chunked") {
         status = reader->readLine(result, sock, READ_SIZE);
         if (status)
-            return status;
+            return checkStatus(status);
         read_count = stoi(result, nullptr, 16);
         status = reader->readCount(result, read_count, sock);
         if (status)
-            return status;
-        request.body += result;
-        if (BodyLimit != 0 && request.body.length() > BodyLimit)
-            return onError(413);
+            return checkStatus(status);
+        if (!reader->use_file) {
+	        request.body += result;
+	        if (BodyLimit != 0 && request.body.length() > BodyLimit)
+		        return onError(413);
+        } else
+        	request.file_fd = reader->file_fd;
     } else {
         if (request.headers.count("Content-Length")) {
-            status = reader->readCount(result, stoi(request.headers["Content-Length"]), sock);
+        	int size = stoi(request.headers["Content-Length"]);
+
+        	if (BodyLimit != 0 && size > BodyLimit)
+		        return onError(413);
+
+	        status = reader->readCount(result, size, sock);
             if (status)
-                return status;
+                return checkStatus(status);
+
+	        if (!reader->use_file)
+		        request.body += result;
+	        else
+		        request.file_fd = reader->file_fd;
         } else {
             status = reader->getStorage(result);
+	        request.body = result;
             if (status)
-                return status;
+                return checkStatus(status);
         }
-        request.body = result;
     }
+
     try {
         response = server->SendHttpResponse(addr, sock, &request, config);
         if (response.code() >= 200 && response.code() < 300) {

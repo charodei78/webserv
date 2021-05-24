@@ -30,6 +30,7 @@ namespace Http {
 	public:
 		query_s query;
 		string  body;
+		int     file_fd;
 		map<string, string> headers;
 		int     from;
 

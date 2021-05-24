@@ -17,6 +17,9 @@ public:
 	Reader();
 	~Reader();
 	bool    reedUsed;
+	bool    use_file;
+	int     file_fd;
+
 
 	Reader(Reader const &rhs);
 	Reader &operator=(Reader const &rhs);

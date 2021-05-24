@@ -58,6 +58,100 @@ string file_get_contents(const string& path)
     return str;
 }
 
+int     file_put_contents(string filename, int fd, int rights)
+{
+	unsigned        index;
+	int             target;
+	int             count;
+	unsigned char   buf[10240] = {};
+
+	if (filename.empty())
+		return -1;
+	filename = abs_path(filename);
+	if (!is_file(filename)) {
+		if (is_dir(filename))
+			return -1;
+		index = filename.find_last_of('/');
+		if (index != -1)
+			if (create_dir(filename.substr(0, index)) == -1)
+				return pError("mkdir");
+	}
+	target = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, rights);
+	if (target == -1)
+		return pError("open");
+
+	do {
+		count = read(fd, buf, 10239);
+		if (count == -1)
+			unlink(filename.c_str());
+		if (!count)
+			continue;
+		if (write(target, buf, count) == -1)
+		{
+			unlink(filename.c_str());
+			pError("write");
+			close(target);
+			return -1;
+		}
+		memset(buf, 0, 10240);
+	} while (count != 0);
+	return 0;
+}
+
+
+int create_dir(string path, int rights)
+{
+	unsigned    index;
+	int         result;
+	string      target;
+
+	if (path[0] != '/')
+		path = abs_path(path);
+	if (is_dir(path))
+		return (0);
+	if (path == ".." || path == ".")
+		return (0);
+	index = path.find_last_of('/');
+	if (index != -1) {
+		target = path.substr(0, index);
+		if (!is_dir(target))
+			result = create_dir(target, rights);
+	}
+	if (result == -1)
+		return -1;
+	return mkdir(path.c_str(), rights);
+}
+
+int file_put_contents(string filename, const string &data, int rights)
+{
+	unsigned    index;
+	int         fd;
+
+	if (filename.empty())
+		return -1;
+	filename = abs_path(filename);
+	if (!is_file(filename)) {
+		if (is_dir(filename))
+			return -1;
+		index = filename.find_last_of('/');
+		if (index != -1)
+			if (create_dir(filename.substr(0, index)) == -1)
+				return pError("mkdir");
+	}
+	fd = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, rights);
+	if (fd == -1)
+		return pError("open");
+	if (write(fd, data.c_str(), data.size()) == -1)
+	{
+		pError("write");
+		close(fd);
+		return -1;
+	}
+	close(fd);
+	return 0;
+}
+
+
 string to_http_date(time_t const &timeval)
 {
 	char        buffer[256] = "";
@@ -120,57 +214,6 @@ std::string& trim(std::string& str, const std::string& chars)
 {
     return ltrim(rtrim(str, chars), chars);
 }
-
-int create_dir(string path, int rights)
-{
-	unsigned    index;
-	int         result;
-	string      target;
-
-	if (path[0] != '/')
-		path = abs_path(path);
-	if (is_dir(path))
-		return (0);
-	if (path == ".." || path == ".")
-		return (0);
-	index = path.find_last_of('/');
-	if (index != -1) {
-		target = path.substr(0, index);
-		if (!is_dir(target))
-			result = create_dir(target, rights);
-	}
-	if (result == -1)
-		return -1;
-	return mkdir(path.c_str(), rights);
-}
-
-int file_put_contents(string filename, const string &data, int rights)
-{
-	unsigned    index;
-	int         fd;
-
-	if (filename.empty())
-		return -1;
-	filename = abs_path(filename);
-	if (!is_file(filename)) {
-		index = filename.find_last_of('/');
-		if (index != -1)
-			if (create_dir(filename.substr(0, index)) == -1)
-				return pError("mkdir");
-	}
-	fd = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, rights);
-	if (fd == -1)
-		return pError("open");
-	if (write(fd, data.c_str(), data.size()) == -1)
-	{
-		pError("write");
-		close(fd);
-		return -1;
-	}
-	close(fd);
-	return 0;
-}
-
 
 string  abs_path(string path) {
 	string  result;

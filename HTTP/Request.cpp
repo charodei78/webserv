@@ -81,7 +81,7 @@ Request *Request::parseHeaders(const string &str)
 
 Request::Request()
 {
-
+	file_fd = 0;
 }
 
 string Request::getLog(unsigned int code)

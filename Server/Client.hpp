@@ -57,6 +57,8 @@ public:
     int getSock();
     int sendResponse();
     int readRequest();
+
+	int checkStatus(int status);
 };
 
 
