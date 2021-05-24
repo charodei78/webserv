@@ -53,6 +53,7 @@ int Client::readRequest(ServerListener &listener)
     int BodyLimit;
     // Querry
 
+    reader->reedUsed = false;
     time(&lastOperationTime);
     if (!request.query.is_set) {
         status = reader->readLine(result, sock, READ_SIZE * 2);

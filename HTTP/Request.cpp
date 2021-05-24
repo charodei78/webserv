@@ -61,8 +61,10 @@ Request *Request::parseQuery(const string &str)
 	args = split_pair("?" , trim(parts[1]));
 	query.address = args.first;
 	query.query_string = args.second;
-	if (parts.size() == 3)
+	if (parts.size() == 3) {
         query.protocol = parts[2].substr(5);
+
+	}
 	else
 	    query.protocol = "1.1";
 	query.protocol = trim(query.protocol);
