@@ -139,7 +139,7 @@ Http::Response Server::SendHttpResponse(const sockaddr_in &addr, const int sock,
             delete dirs;
         }
         else
-            return *response.code(403);
+            return *response.code(404);
     }
     response.attachDefaultHeaders(*config);
     return response;

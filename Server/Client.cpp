@@ -25,6 +25,7 @@ int Client::sendResponse() {
     string responseString = response.toString();
     send(sock, responseString.c_str(), responseString.length(), O_NONBLOCK);
     currentState = closeConnection;
+    return 1;
 }
 
 int Client::onError(int code)
@@ -83,7 +84,7 @@ int Client::readRequest(ServerListener &listener)
             return onError(405);
 
         if (request.headers.count("Content-Length"))
-            if (stoi(request.headers["Content-Length"]) > BodyLimit)
+            if (BodyLimit != 0 &&  stoi(request.headers["Content-Length"]) > BodyLimit)
                 return onError(405);
 
     }
@@ -97,7 +98,7 @@ int Client::readRequest(ServerListener &listener)
         if (status)
             return status;
         request.body += result;
-        if (request.body.length() > BodyLimit)
+        if (BodyLimit != 0 && request.body.length() > BodyLimit)
             return onError(413);
     } else {
         if (request.headers.count("Content-Length")) {
@@ -118,7 +119,7 @@ int Client::readRequest(ServerListener &listener)
 	        Server::printLog(addr, request.getLog(response.code()));
 	        return 1;
         }
-        onError(response.code());
+        return onError(response.code());
     } catch (exception &e) {
         response.code(500);
         try {
@@ -126,8 +127,10 @@ int Client::readRequest(ServerListener &listener)
         } catch (exception &e) {
             cerr << e.what() << endl;
         }
-        onError(500);
+        return onError(500);
     }
+
+    return 0;
 }
 
 Client &Client::operator=(const Client &src) {

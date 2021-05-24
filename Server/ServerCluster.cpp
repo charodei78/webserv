@@ -52,6 +52,7 @@ bool ServerCluster::RunServers()
             {
                 try
                 {
+                    cout << "New connection\n";
                     Client *newClient = listenerIter->acceptClient();
 
                     if (newClient->getSock() > max_fd)

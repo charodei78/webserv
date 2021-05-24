@@ -5,12 +5,13 @@ Config::Config()
 {
     auth = false;
     auth_file_path = "";
+    autoindex = false;
     cgiPath = "";
     port = 80;
     index = "index.html";
     domain = "localhost";
     ip = "127.0.0.1";
-    limitClientBodySize = 1024;
+    limitClientBodySize = 0;
     rootDirectory = "/var/www";
 }
 

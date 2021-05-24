@@ -60,6 +60,7 @@ int Reader::readCount(string &result, unsigned long count, int fd)
             return 1;
 		if (read(fd, buf, count - result.length()) < 1)
 			return -1;
+		reedUsed = true;
 		result += buf;
 		storage = "";
 		delete[] buf;
