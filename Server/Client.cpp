@@ -9,6 +9,7 @@ Client::Client(int sock, sockaddr_in addr)
     currentState = requestParsing;
     reader = new Reader();
     this->sock = sock;
+    this->server = nullptr;
     this->addr = addr;
     time(&lastOperationTime);
 }
@@ -20,6 +21,9 @@ int Client::getSock() {
 
 int Client::sendResponse() {
     time(&lastOperationTime);
+    string responseString = response.toString();
+    send(sock, responseString.c_str(), responseString.length(), O_NONBLOCK);
+    currentState = closeConnection;
 }
 
 int Client::onError(int code)
@@ -31,7 +35,7 @@ int Client::onError(int code)
     currentState = sendingResponse;
     return 1;
 }
-int Client::readRequest(ServerListener &listener, int socket)
+int Client::readRequest(ServerListener &listener)
 {
     string result;
     Config *config;
@@ -39,8 +43,10 @@ int Client::readRequest(ServerListener &listener, int socket)
     int read_count;
     int BodyLimit;
     // Querry
+
+    time(&lastOperationTime);
     if (!request.query.is_set) {
-        status = reader->readLine(result, socket, READ_SIZE * 2);
+        status = reader->readLine(result, sock, READ_SIZE * 2);
         if (status)
             return status;
         request.parseQuery(result);
@@ -49,7 +55,7 @@ int Client::readRequest(ServerListener &listener, int socket)
     }
     // Headers
     if (request.headers.empty()) {
-        status = reader->readBefore(result, socket, "\r\n\r\n", READ_SIZE);
+        status = reader->readBefore(result, sock, "\r\n\r\n", READ_SIZE);
         if (status)
             return status;
         // TODO: max size 413
@@ -84,11 +90,11 @@ int Client::readRequest(ServerListener &listener, int socket)
     }
     // Body
     if (request.headers["Transfer-Encoding"] == "chunked") {
-        status = reader->readLine(result, socket, READ_SIZE);
+        status = reader->readLine(result, sock, READ_SIZE);
         if (status)
             return status;
         read_count = stoi(result, nullptr, 16);
-        status = reader->readCount(result, read_count, socket);
+        status = reader->readCount(result, read_count, sock);
         if (status)
             return status;
         request.body += result;
@@ -96,18 +102,18 @@ int Client::readRequest(ServerListener &listener, int socket)
             return onError(413);
     } else {
         if (request.headers.count("Content-Length")) {
-            status = reader->readCount(result, stoi(request.headers["Content-Length"]), socket);
+            status = reader->readCount(result, stoi(request.headers["Content-Length"]), sock);
             if (status)
                 return status;
         } else {
-            status = reader->readCount(result, READ_SIZE, socket);
+            status = reader->getStorage(result);
             if (status)
                 return status;
         }
         request.body = result;
     }
     try {
-        response = server->SendHttpResponse(addr, socket, &request, config);
+        response = server->SendHttpResponse(addr, sock, &request, config);
         if (response.code() >= 200 && response.code() < 300) {
             currentState = sendingResponse;
             return 1;
@@ -125,15 +131,20 @@ int Client::readRequest(ServerListener &listener, int socket)
 }
 
 Client &Client::operator=(const Client &src) {
-    this->lastOperationTime = src.lastOperationTime;
-    this->sock = src.sock;
-    this->request = src.request;
-    this->response = src.response;
-    this->currentState = src.currentState;
-    this->readBuffer = src.readBuffer;
-    this->sendBuffer = src.sendBuffer;
-    this->attachedServer = src.attachedServer;
-    this->addr = src.addr;
+    if (src.sock == 0)
+        return *this;
+    if (this != &src) {
+        this->lastOperationTime = src.lastOperationTime;
+        this->sock = src.sock;
+        this->reader = src.reader;
+        this->request = src.request;
+        this->response = src.response;
+        this->currentState = src.currentState;
+        this->readBuffer = src.readBuffer;
+        this->sendBuffer = src.sendBuffer;
+        this->attachedServer = src.attachedServer;
+        this->addr = src.addr;
+    }
     return *this;
 }
 
@@ -142,5 +153,4 @@ Client::Client(const Client &c) {
 }
 
 Client::~Client() {
-    delete reader;
 }

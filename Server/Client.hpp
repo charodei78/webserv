@@ -37,16 +37,20 @@ private:
     string readBuffer;
     string sendBuffer;
     Reader *reader;
+
+    Client();
 public:
     state currentState;
     Server *server;
     Http::Request request;
     Http::Response response;
+
+
     Client &operator=(const Client &src);
     Client(const Client&);
     ~Client();
     int onError(int code);
-    int readRequest(ServerListener &listener, int socket);
+    int readRequest(ServerListener &listener);
     Client(int sock, sockaddr_in addr);
     time_t lastOperationTime;
     int getSock();

@@ -31,8 +31,8 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
 	if (n_pos == -1)
 		return 1;
 
-	result += tmp.substr(0, n_pos);
-	storage = tmp.substr(n_pos + needle.length());
+	result = storage.substr(0, n_pos);
+    storage = storage.substr(n_pos + needle.length());
 	return 0;
 }
 
@@ -56,6 +56,8 @@ int Reader::readCount(string &result, unsigned long count, int fd)
 		storage = result.substr(count + 2);
 		result = result.substr(0, count);
 	} else {
+        if (reedUsed)
+            return 1;
 		if (read(fd, buf, count - result.length()) < 1)
 			return -1;
 		result += buf;
@@ -67,6 +69,7 @@ int Reader::readCount(string &result, unsigned long count, int fd)
 
 Reader::Reader(): reedUsed(false)
 {
+    storage = "";
 };
 
 Reader::Reader(Reader const &rhs)
@@ -84,4 +87,9 @@ Reader &Reader::operator=(Reader const &rhs)
 		this->storage = rhs.storage;
 	}
 	return *this;
+}
+
+int Reader::getStorage(string &result) {
+    result = storage;
+    return 0;
 };

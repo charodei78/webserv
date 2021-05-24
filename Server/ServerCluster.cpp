@@ -2,6 +2,7 @@
 // Created by Harren Leilani on 5/3/21.
 //
 
+#include <vector>
 #include "ServerCluster.hpp"
 
 
@@ -29,7 +30,7 @@ bool ServerCluster::RunServers()
         listenerIter++;
     }
 
-    vector<Client>::iterator clientIter;
+    vector<Client*>::iterator clientIter;
     while (true)
     {
         timeval timeout = timeoutMaster;
@@ -51,13 +52,13 @@ bool ServerCluster::RunServers()
             {
                 try
                 {
-                    Client newClient = listenerIter->acceptClient();
+                    Client *newClient = listenerIter->acceptClient();
 
-                    if (newClient.getSock() > max_fd)
-                        max_fd = newClient.getSock();
+                    if (newClient->getSock() > max_fd)
+                        max_fd = newClient->getSock();
 
                     listenerIter->clients.push_back(newClient);
-                    FD_SET(newClient.getSock(), &readMasterSet);
+                    FD_SET(newClient->getSock(), &readMasterSet);
                 }
                 catch (exception)
                 {
@@ -73,33 +74,43 @@ bool ServerCluster::RunServers()
             while (clientIter != listenerIter->clients.end())
             {
                 //Нужно ли читать и есть ли что читать
-                if (clientIter->currentState == requestParsing && FD_ISSET(clientIter->getSock(), &readSet))
+                if ((*clientIter)->currentState == requestParsing && FD_ISSET((*clientIter)->getSock(), &readSet))
                 {
-                    int res = clientIter->readRequest(*listenerIter, clientIter->getSock());
-                    if (res <= 0)
+                    int res = (*clientIter)->readRequest(*listenerIter);
+                    if (res <= 0) {
                         closeClientConnection(*listenerIter, clientIter);
-
-                    if (clientIter->currentState == sendingResponse)
+                        continue;
+                    }
+                    if ((*clientIter)->currentState == sendingResponse)
                     {
-                        FD_CLR(clientIter->getSock(), &readMasterSet);
-                        FD_SET(clientIter->getSock(), &writeMasterSet);
+                        FD_CLR((*clientIter)->getSock(), &readMasterSet);
+                        FD_SET((*clientIter)->getSock(), &writeMasterSet);
                     }
                 }
 
                 //Запись, если есть куда писать и нужно ли ему писать
-                if (clientIter->currentState == sendingResponse && FD_ISSET(clientIter->getSock(), &writeSet))
+                if ((*clientIter)->currentState == sendingResponse && FD_ISSET((*clientIter)->getSock(), &writeSet))
                 {
-                    int res = clientIter->sendResponse();
+                    int res = (*clientIter)->sendResponse();
                     if (res <= 0)
+                    {
                         closeClientConnection(*listenerIter, clientIter);
+                        continue;
+                    }
 
                 }
 
-                if (clientIter->currentState == closeConnection)
+                if ((*clientIter)->currentState == closeConnection)
+                {
                     closeClientConnection(*listenerIter, clientIter);
+                    continue;
+                }
 
-                if (difftime(currentTime, clientIter->lastOperationTime) > OPERATION_TIMEOUT)
+                if (difftime(currentTime, (*clientIter)->lastOperationTime) > OPERATION_TIMEOUT)
+                {
                     closeClientConnection(*listenerIter, clientIter);
+                    continue;
+                }
 
                 clientIter++;
             }
@@ -148,11 +159,12 @@ void ServerCluster::intializeServerListeners() {
     }
 }
 
-void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client>::iterator &clientIter) {
-    if (FD_ISSET(clientIter->getSock(), &writeMasterSet))
-        FD_CLR(clientIter->getSock(), &writeMasterSet);
-    if (FD_ISSET(clientIter->getSock(), &readMasterSet))
-        FD_CLR(clientIter->getSock(), &readMasterSet);
+void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client *>::iterator &clientIter) {
+    if (FD_ISSET((*clientIter)->getSock(), &writeMasterSet))
+        FD_CLR((*clientIter)->getSock(), &writeMasterSet);
+    if (FD_ISSET((*clientIter)->getSock(), &readMasterSet))
+        FD_CLR((*clientIter)->getSock(), &readMasterSet);
+    close((*clientIter)->getSock());
+    delete *clientIter;
     listener.clients.erase(clientIter);
-    close(clientIter->getSock());
 }

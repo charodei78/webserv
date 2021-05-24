@@ -20,7 +20,7 @@ public:
     explicit ServerCluster(list<Config> &serverConfigs);
 private:
     void intializeServerListeners();
-    void closeClientConnection(ServerListener &listener, vector<Client>::iterator &clientIter);
+    void closeClientConnection(ServerListener &listener, vector<Client *>::iterator &clientIter);
     vector<ServerListener> serverListeners;
     fd_set readMasterSet;
     fd_set writeMasterSet;

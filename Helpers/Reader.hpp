@@ -27,6 +27,7 @@ public:
 	int     readCount(string &result, unsigned long count, int fd);
 	void    clearStorage();
 
+    int getStorage(string &result);
 };
 
 

@@ -93,7 +93,7 @@ int ServerListener::getSock() {
     return sock;
 }
 
-Client ServerListener::acceptClient() {
+Client * ServerListener::acceptClient() {
     sockaddr_in client_addr;
 
     int addrlen = sizeof(client_addr);
@@ -103,7 +103,7 @@ Client ServerListener::acceptClient() {
 
     fcntl(client_socket, F_SETFL, O_NONBLOCK);
 
-    Client newClient(client_socket, client_addr);
+    Client *newClient = new Client(client_socket, client_addr);
 
     return newClient;
 }
