@@ -39,6 +39,8 @@ private:
     Reader *reader;
 	Config *config;
 
+	string responseBuffer = "";
+
 	Client();
 public:
     state currentState;

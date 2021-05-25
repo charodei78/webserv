@@ -22,9 +22,14 @@ int Client::getSock() {
 
 int Client::sendResponse() {
     time(&lastOperationTime);
-    string responseString = response.toString();
-    send(sock, responseString.c_str(), responseString.length(), O_NONBLOCK);
-    currentState = closeConnection;
+    if (responseBuffer.empty())
+        responseBuffer = response.toString();
+    int sended = send(sock, responseBuffer.c_str(), responseBuffer.length(), 0);
+    if (sended <= 0)
+        return sended;
+    responseBuffer = responseBuffer.erase(responseBuffer.size() - sended);
+    if (responseBuffer.empty())
+        currentState = closeConnection;
     return 1;
 }
 
