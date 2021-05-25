@@ -88,8 +88,10 @@ int     file_put_contents(string filename, int fd, int rights)
 			continue;
 		if (write(target, buf, count) == -1)
 		{
-			unlink(filename.c_str());
 			pError("write");
+			if (unlink(filename.c_str()) < 0)
+				pError("unlink");
+
 			close(target);
 			return -1;
 		}

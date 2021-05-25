@@ -16,9 +16,10 @@ class Reader
 public:
 	Reader();
 	~Reader();
-	bool    reedUsed;
+	bool    readUsed;
 	bool    use_file;
-	int     file_fd;
+	int     fileFd;
+	size_t  fileSize;
 
 
 	Reader(Reader const &rhs);
@@ -27,7 +28,7 @@ public:
 	int     readLine(string &result, int fd, unsigned buf_size = 128);
 	int     readBefore(string &result, int fd, string const &needle, unsigned buf_size = 256);
 //	int     readOne(string &result, int fd);
-	int     readCount(string &result, unsigned long count, int fd);
+	int readCount(unsigned long count, int fd);
 	void    clearStorage();
 
     int getStorage(string &result);

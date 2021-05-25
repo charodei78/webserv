@@ -54,11 +54,10 @@ int Client::readRequest(ServerListener &listener)
 {
     string result;
     int status;
-    int read_count;
     int BodyLimit;
     // Querry
 
-    reader->reedUsed = false;
+    reader->readUsed = false;
     time(&lastOperationTime);
     if (!request.query.is_set) {
         status = reader->readLine(result, sock, READ_SIZE * 2);
@@ -96,25 +95,60 @@ int Client::readRequest(ServerListener &listener)
             return onError(405);
 
         if (request.headers.count("Content-Length"))
-            if (BodyLimit != 0 &&  stoi(request.headers["Content-Length"]) > BodyLimit)
-                return onError(405);
+        {
+	        if (BodyLimit != 0 &&  stoi(request.headers["Content-Length"]) > BodyLimit)
+		        return onError(405);
+        }
 
     }
+
+    if (config)
+	    BodyLimit = config->limitClientBodySize;
+
+	result = "";
+    if (request.query.method == "PUT")
+    	cout << "";
     // Body
     if (request.headers["Transfer-Encoding"] == "chunked") {
-        status = reader->readLine(result, sock, READ_SIZE);
-        if (status)
-            return checkStatus(status);
-        read_count = stoi(result, nullptr, 16);
-        status = reader->readCount(result, read_count, sock);
-        if (status)
-            return checkStatus(status);
-        if (!reader->use_file) {
-	        request.body += result;
-	        if (BodyLimit != 0 && request.body.length() > BodyLimit)
-		        return onError(413);
-        } else
-        	request.file_fd = reader->file_fd;
+    	if (!this->waitingRead || read_count > OPERATION_BYTE_SIZE) {
+    		errno = 0;
+		    status = reader->readLine(result, sock, READ_SIZE);
+//			cout << "status "<< status << endl;
+		    if (status)
+			    return checkStatus(status);
+//		    cout << "result " << result << endl;
+
+		    read_count = stoi(result, nullptr, 16);
+		    if (read_count == size_t() - 1)
+		    {
+			    pError("stoi");
+		    	read_count = 0;
+		    }
+//		    cout << " read_count " << result << " " << read_count << endl;
+//		    if (read_count > 50000)
+//		    	cout << result << endl;
+    	}
+
+	    status = reader->readCount(read_count, sock);
+
+	    if (!reader->use_file) {
+		    request.body += result;
+		    if (BodyLimit != 0 && request.body.length() > BodyLimit)
+			    return onError(413);
+	    } else
+		    request.file_fd = reader->fileFd;
+
+
+
+	    if (status)
+	    {
+		    this->waitingRead = true;
+		    return checkStatus(status);
+	    }
+	    this->waitingRead = false;
+	    if (read_count != 0)
+		    return 1;
+
     } else {
         if (request.headers.count("Content-Length")) {
         	int size = stoi(request.headers["Content-Length"]);
@@ -122,14 +156,16 @@ int Client::readRequest(ServerListener &listener)
         	if (BodyLimit != 0 && size > BodyLimit)
 		        return onError(413);
 
-	        status = reader->readCount(result, size, sock);
+	        status = reader->readCount(size, sock);
             if (status)
                 return checkStatus(status);
+
+            cout   << result.length();
 
 	        if (!reader->use_file)
 		        request.body += result;
 	        else
-		        request.file_fd = reader->file_fd;
+		        request.file_fd = reader->fileFd;
         } else {
             status = reader->getStorage(result);
 	        request.body = result;
@@ -163,7 +199,8 @@ Client &Client::operator=(const Client &src) {
     if (src.sock == 0)
         return *this;
     if (this != &src) {
-        this->lastOperationTime = src.lastOperationTime;
+	    this->waitingRead = false;
+	    this->lastOperationTime = src.lastOperationTime;
         this->sock = src.sock;
         this->reader = src.reader;
         this->request = src.request;
@@ -179,6 +216,8 @@ Client &Client::operator=(const Client &src) {
 
 Client::Client(const Client &c) {
     *this = c;
+	read_count = 0;
+	this->waitingRead = false;
 }
 
 Client::~Client() {

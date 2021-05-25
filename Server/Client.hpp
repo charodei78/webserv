@@ -6,8 +6,6 @@
 #define WEBSERV_CLIENT_HPP
 
 
-#define OPERATION_BYTE_SIZE 32768
-
 #include "Server.hpp"
 #include "../Helpers/Reader.hpp"
 #include "../HTTP/Request.hpp"
@@ -38,6 +36,8 @@ private:
     string sendBuffer;
     Reader *reader;
 	Config *config;
+	long read_count;
+	bool    waitingRead;
 
 	string responseBuffer = "";
 

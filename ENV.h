@@ -7,7 +7,8 @@
 
 #define TMP_PATH "../tmp"
 #define DEFAULT_ERROR_PAGE "../html/error.static_html"
-#define MAX_STACK_SIZE 800000
+#define MAX_STACK_SIZE 500
+#define OPERATION_BYTE_SIZE 32768
 
 #include <string>
 
