@@ -7,19 +7,18 @@
 
 
 #include "Server.hpp"
+#include "RequestParser.hpp"
 #include "../Helpers/Reader.hpp"
 #include "../HTTP/Request.hpp"
 #include "ctime"
 #include "ServerListener.hpp"
 
-enum state
-        {
-    requestParsing,
-    sendingResponse,
-    closeConnection
-        };
 
+
+
+class RequestParser;
 class ServerListener;
+
 
 using namespace std;
 
@@ -27,40 +26,45 @@ using namespace std;
 #define READ_SIZE 32768
 #endif
 
+enum state
+{
+	requestParsing,
+	sendingResponse,
+	closeConnection
+};
+
 class Client {
+
+
 private:
     Server attachedServer;
     sockaddr_in addr;
     int sock;
-    string readBuffer;
-    string sendBuffer;
-    Reader *reader;
-	Config *config;
-	long read_count;
-	bool    waitingRead;
+    string  readBuffer;
+    string  sendBuffer;
+	Config  *config;
 
 	string responseBuffer = "";
 
-	Client();
+//	Client();
 public:
     state currentState;
     Server *server;
-    Http::Request request;
-    Http::Response response;
+	Http::Request request;
+	Http::Response response;
+	RequestParser *requestParser;
 
 
     Client &operator=(const Client &src);
     Client(const Client&);
     ~Client();
-    int onError(int code);
     int readRequest(ServerListener &listener);
     Client(int sock, sockaddr_in addr);
     time_t lastOperationTime;
     int getSock();
     int sendResponse();
-    int readRequest();
 
-	int checkStatus(int status);
+
 };
 
 

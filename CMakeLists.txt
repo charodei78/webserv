@@ -29,4 +29,4 @@ add_executable(webserv main.cpp
         Server/ServerListener.cpp
         Server/ServerListener.hpp
         HTTP/CGIRequest.cpp
-        HTTP/CGIRequest.hpp exceptions/http_exception.cpp exceptions/http_exception.hpp exceptions/file_not_found_exception.cpp exceptions/file_not_found_exception.hpp exceptions/webserv_exceptions.hpp)
+        HTTP/CGIRequest.hpp exceptions/http_exception.cpp exceptions/http_exception.hpp exceptions/file_not_found_exception.cpp exceptions/file_not_found_exception.hpp exceptions/webserv_exceptions.hpp Server/RequestParser.cpp Server/RequestParser.hpp)

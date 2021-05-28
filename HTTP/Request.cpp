@@ -94,3 +94,18 @@ string Request::getLog(unsigned int code)
 		message += "?" + query.query_string;
 	return message;
 }
+
+int Request::parseChunkedBody(int fd)
+{
+//	int size = 0;
+//	string *result = new string[body.size()]{0};
+//	int index;
+//
+//	do {
+//		index = body.find("\r\n");
+//		size = stoi(body.substr(0, index), 0,16);
+//		*result += body.substr(index, size);
+//		body = body.substr(size + 2);
+//	} while (size != 0);
+	return 0;
+}
