@@ -4,6 +4,8 @@ RequestParser::RequestParser(const sockaddr_in addr) : addr(addr)
 {
 	reader = new Reader;
 	bodyFd = 0;
+	remains = 0;
+	fileSize = 0;
 	config = nullptr;
 	server = nullptr;
 };
@@ -15,6 +17,39 @@ RequestParser::~RequestParser()
 	delete reader;
 };
 
+bool RequestParser::parseChunks(string &str)
+{
+	int length = 0;
+	int start;
+	int totalLength = 0;
+	string contentLength;
+
+	if (remains)
+		totalLength = remains;
+	fileSize += str.length();
+	while (!str.empty())
+	{
+		try {
+			start = str.find("\r\n", totalLength + 2);
+			if (start == -1)
+				break;
+			contentLength = str.substr(totalLength, start - totalLength);
+			str.erase(totalLength, start - totalLength + 2);
+			length = stoi(contentLength, nullptr, 16);
+			this->remains = length - (str.length() - totalLength);
+			totalLength += length;
+			if (this->remains < 0)
+				this->remains = 0;
+			if (length == 0) {
+				str.erase(str.end() - 2, str.end());
+				return true;
+			}
+		} catch (exception) {
+			return false;
+		}
+	}
+	return false;
+}
 
 int RequestParser::parseChunked(int sock, int bodyLimit)
 {
@@ -31,42 +66,42 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 		}
 	}
 
+	string *sBuf = new string;
 
 	if (!reader->isEmpty()) {
 		string tmp;
 		reader->getStorage(tmp);
+
+		sBuf->reserve(READ_SIZE + tmp.length() + 1);
 		reader->clearStorage();
-		write(bodyFd, tmp.c_str(), tmp.length());
-
-		index = tmp.find("0\r\n\r\n", tmp.length() - 5);
-
-		if (index != -1)
-			return 0;
+		*sBuf += tmp;
 	}
+	else
+		sBuf->reserve(READ_SIZE + 1);
+
 
 	readRet = read(sock, buf, READ_SIZE);
 
-	index = string(buf).find("0\r\n\r\n", readRet - 5);
+	*sBuf += buf;
+	delete[] buf;
 
-	if (index != -1)
+	bool res = parseChunks(*sBuf);
+
+	writeRet = write(bodyFd, sBuf->c_str(), sBuf->length());
+	delete sBuf;
+	if (writeRet < 0)
+		pError("write");
+
+	if (res)
 		return 0;
 
 	if (readRet < 0)
 	{
-		delete[] buf;
 		if (errno == EAGAIN)
 			return 1;
 		return -1;
 	}
 
-
-	if (readRet > 0) {
-		writeRet = write(bodyFd, buf, readRet);
-		if (writeRet < 0)
-			pError("write");
-	}
-
-	delete[] buf;
 
 
 
@@ -143,10 +178,7 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	if (config)
 		bodyLimit = config->limitClientBodySize;
 
-	result = "";
-//	if (request.query.method == "PUT")
-//		cout << "";
-	// Body
+
 	if (request.headers["Transfer-Encoding"] == "chunked") {
 		int ret = parseChunked(sock, bodyLimit);
 		if (ret != 0)

@@ -22,6 +22,9 @@ class RequestParser
 	int onError(int code);
 	int parseChunked(int sock, int bodyLimit);
 
+	int remains;
+	long fileSize;
+
 public:
 	RequestParser(const sockaddr_in addr);
 	~RequestParser();
@@ -30,7 +33,6 @@ public:
 	Http::Request       request;
 	Http::Response      response;
 
-
 	const sockaddr_in   addr;
 	int                 bodyFd;
 	Config              *config;
@@ -38,6 +40,7 @@ public:
 
 	int parse(int sock, ServerListener &listener);
 
+	bool parseChunks(string &str);
 };
 
 
