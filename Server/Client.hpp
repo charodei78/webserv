@@ -11,6 +11,8 @@
 #include "../Helpers/Reader.hpp"
 #include "../HTTP/Request.hpp"
 #include "ctime"
+#include <algorithm>
+#include "RequestParser.hpp"
 #include "ServerListener.hpp"
 
 
@@ -45,6 +47,7 @@ private:
 	Config  *config;
 
 	string responseBuffer = "";
+	bool    responseIsChunked;
 
 //	Client();
 public:

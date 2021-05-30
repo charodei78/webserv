@@ -6,7 +6,7 @@
 
 using namespace Http;
 
-Response::Response(): response_status_code(200) {}
+Response::Response(): response_status_code(200), isCgi(false) {}
 
 Response * Response::code(unsigned int code)
 {
@@ -58,7 +58,6 @@ Response *Response::header(const string & name, const string& value)
 	return this;
 }
 
-
 string Http::get_code_message(unsigned int code)
 {
 	int size = sizeof(Http::codes) / sizeof(int);
@@ -76,6 +75,8 @@ Response *Response::statusText(const string& name)
 	this->response_status_text = name;
 	return this;
 }
+// Content-Type: text/html; charset=utf-8
+// Status: 200 OK
 
 string Response::toString()
 {
@@ -88,24 +89,28 @@ string Response::toString()
 		message += this->response_status_text;
 	else
 		message += get_code_message(this->response_status_code);
-	message += "\n";
+	message += "\r\n";
 
 	// insert headers
 	map<string, string>::iterator begin = headers.begin();
 	map<string, string>::iterator end = headers.end();
 	while (begin != end)
 	{
-		message += begin->first + ": " + begin->second + "\n";
+		message += begin->first + ": " + begin->second + "\r\n";
 		begin++;
 	}
-	if (headers.count("Content-Length") == 0) {
-		message += "Content-Length: " + to_string(this->response_body.length()) + "\n";
-	}
-	if (headers.count("Content-Type") == 0) {
-		message += "Content-Type: text/plain\n";
+
+	bool chunked = headers["Transfer-Encoding"] == "chunked";
+
+	if (!chunked && headers.count("Content-Length") == 0) {
+		message += "Content-Length: " + to_string(this->response_body.length()) + "\r\n";
 	}
 
-	message += "\n" + this->response_body;
+	if (headers.count("Content-Type") == 0) {
+		message += "Content-Type: text/plain\r\n";
+	}
+
+	message += "\r\n" + this->response_body;
 
 	return message;
 }
@@ -115,6 +120,7 @@ Response &Response::operator=(const Response &rhs)
 	if (this != &rhs)
 	{
 		this->headers = rhs.headers;
+		this->isCgi = rhs.isCgi;
 		this->response_body = rhs.response_body;
 		this->response_status_code = rhs.response_status_code;
 		this->response_status_text = rhs.response_status_text;
@@ -142,23 +148,23 @@ const string &Response::body()
 	return response_body;
 }
 
-const string &Response::header(const string &name)
+string  Response::header(const string &name)
 {
+	if (!headers.count(name))
+		return "";
 	return headers[name];
 }
 
 Response &Response::operator=(const string &rhs)
 {
-	pair<string, string> message = split_pair("\n\r\n", rhs);
-	if (message.second.empty())
-		message = split_pair("\n\n", rhs);
+	pair<string, string> message = split_pair("\r\n\r\n", rhs);
 	body(message.second);
 
-	vector<string> structure = split("\n", message.first);
+	vector<string> structure = split("\r\n", message.first);
 
 
 	for (int i = 0; i < structure.size(); ++i) {
-		this->headers.insert(split_pair(": ", structure[i])); // TODO: прочитать стандарт насчет пробела
+		this->headers.insert(split_pair(": ", structure[i]));
 	}
 
 	if (headers.count("Status"))

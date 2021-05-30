@@ -49,7 +49,7 @@ bool ServerListener::Intialize()
 }
 
 //Запарсить домен, на который переходят, найти его в списке, если не нашелся то на первый в списке (дефолтный), 
-//и уже в нем вызвать метод SendHttpResponse
+//и уже в нем вызвать метод getHttpResponse
 
 string tempHost;
 bool IsServerNameEqualHost(Server server)

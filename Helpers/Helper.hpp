@@ -32,13 +32,23 @@ string last_modified(string path);
 
 string& ltrim(string& str, const string& chars = "\t\n\v\f\r ");
 string& rtrim(string& str, const string& chars = "\t\n\v\f\r ");
-
 string& trim(string& str, const string& chars = "\t\n\v\f\r ");
+
+int cmp_word(string needle, string haystack, int limit);
+int		match(const char *s1, const char *s2);
+int		n_match(const char *s1, const char *s2);
+
 int isEmptySpace(int c);
 bool isContain(string str, int(*predicate)(int));
 
 int pError(string const&program);
 
+string      toUpper(string str);
+
+string      toCgiHeader(string str);
+string      toChunked(string body);
+
+string      itoa(int value, int base = 10);
 
 vector<string> *get_dir_content(string const &path);
 

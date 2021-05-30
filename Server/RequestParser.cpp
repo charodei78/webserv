@@ -19,23 +19,25 @@ RequestParser::~RequestParser()
 
 bool RequestParser::parseChunks(string &str)
 {
-	int length = 0;
-	int start;
+	int length;
+	size_t start;
 	int totalLength = 0;
 	string contentLength;
 
 	if (remains)
 		totalLength = remains;
-	fileSize += str.length();
 	while (!str.empty())
 	{
 		try {
-			start = str.find("\r\n", totalLength + 2);
-			if (start == -1)
-				break;
-			contentLength = str.substr(totalLength, start - totalLength);
+//			start = str.find("\r\n", totalLength + 2);
+			contentLength = str.substr(totalLength, 8);
+			length = stoi(contentLength, &start, 16);
+
+//			cout << "-----" << contentLength << " " << length << endl << "-----" << endl;
+			start += totalLength;
+//			contentLength = str.substr(totalLength, start - totalLength);
 			str.erase(totalLength, start - totalLength + 2);
-			length = stoi(contentLength, nullptr, 16);
+//			length = stoi(contentLength, nullptr, 16);
 			this->remains = length - (str.length() - totalLength);
 			totalLength += length;
 			if (this->remains < 0)
@@ -45,6 +47,7 @@ bool RequestParser::parseChunks(string &str)
 				return true;
 			}
 		} catch (exception) {
+//			cout << contentLength;
 			return false;
 		}
 	}
@@ -64,6 +67,7 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 			pError("open");
 			return -1;
 		}
+		request.file_fd = bodyFd;
 	}
 
 	string *sBuf = new string;
@@ -79,13 +83,14 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 	else
 		sBuf->reserve(READ_SIZE + 1);
 
-
 	readRet = read(sock, buf, READ_SIZE);
 
 	*sBuf += buf;
 	delete[] buf;
 
 	bool res = parseChunks(*sBuf);
+
+	fileSize += sBuf->length();
 
 	writeRet = write(bodyFd, sBuf->c_str(), sBuf->length());
 	delete sBuf;
@@ -101,9 +106,6 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 			return 1;
 		return -1;
 	}
-
-
-
 
 	return 1;
 }
@@ -145,12 +147,12 @@ int RequestParser::parse(int sock, ServerListener &listener)
 		status = reader->readBefore(result, sock, "\r\n\r\n", READ_SIZE);
 		if (status)
 			return checkStatus(status);
-		// TODO: max size 413
 		request.parseHeaders(result);
 		if (!this->server) {
 			string host = request.headers["Host"];
 			server = &listener.FindServerByHost(host);
 			server = &server->GetLocationServer(request.query.address);
+
 		}
 		config = &server->serverConfig;
 		bodyLimit = config->limitClientBodySize;
@@ -170,7 +172,7 @@ int RequestParser::parse(int sock, ServerListener &listener)
 		if (request.headers.count("Content-Length"))
 		{
 			if (bodyLimit != 0 && stoi(request.headers["Content-Length"]) > bodyLimit)
-				return onError(405);
+				return onError(413);
 		}
 
 	}
@@ -181,10 +183,11 @@ int RequestParser::parse(int sock, ServerListener &listener)
 
 	if (request.headers["Transfer-Encoding"] == "chunked") {
 		int ret = parseChunked(sock, bodyLimit);
+		if (bodyLimit && fileSize > bodyLimit)
+			return onError(413);
 		if (ret != 0)
 			return ret;
-
-		request.parseChunkedBody(bodyFd);
+		lseek(bodyFd, 0, SEEK_SET);
 	} else {
 		if (request.headers.count("Content-Length")) {
 			int size = stoi(request.headers["Content-Length"]);
@@ -209,8 +212,10 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	}
 
 	try {
-		response = server->SendHttpResponse(addr, sock, &request, config);
+		response = server->getHttpResponse(addr, sock, &request, config);
 		if (response.code() >= 200 && response.code() < 300) {
+			if (!response.body().empty() && request.headers["Transfer-Encoding"] == "chunked")
+				response.header("Transfer-Encoding", "chunked");
 			Server::printLog(addr, request.getLog(response.code()));
 			return 2;
 		}
