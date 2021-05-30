@@ -134,6 +134,7 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	int status;
 	int bodyLimit;
 
+	reader->readUsed = false;
 	if (!request.query.is_set) {
 		status = reader->readLine(result, sock, READ_SIZE * 2);
 		if (status)
