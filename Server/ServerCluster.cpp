@@ -41,8 +41,8 @@ bool ServerCluster::RunServers()
 
         int ret = select(max_fd + 1, &readSet, &writeSet, nullptr, &timeout);
 
-        if (!ret)
-            continue;
+        if (ret <= 0)
+            continue; //100056
 
         //Проход по каждому серверу
         listenerIter = serverListeners.begin();
@@ -160,6 +160,7 @@ void ServerCluster::intializeServerListeners() {
 }
 
 void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client *>::iterator &clientIter) {
+	cout << "close" << endl;
     if (FD_ISSET((*clientIter)->getSock(), &writeMasterSet))
         FD_CLR((*clientIter)->getSock(), &writeMasterSet);
     if (FD_ISSET((*clientIter)->getSock(), &readMasterSet))

@@ -48,6 +48,10 @@ int Client::sendResponse() {
 		    sendBuffer += "0\r\n\r\n";
     }
     int sended = send(sock, sendBuffer.c_str(), sendBuffer.length(), 0);
+    if (sendBuffer.length() < 20000)
+		cout << sendBuffer << endl;
+
+	cout << "sended " << sended << endl;
     if (sended <= 0)
         return sended;
 	sendBuffer.erase(0, sended);
