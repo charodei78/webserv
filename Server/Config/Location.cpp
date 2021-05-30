@@ -26,40 +26,43 @@ bool Location::operator<(const Location rhs) const  {
 
 
 bool Location::IsUriValid(const string &uri) const {
-    string avaliablePath = path;
 
-    if (avaliablePath[0] == '*' && avaliablePath[1] == '.')
-    {
-        string avaliableExtension = string(avaliablePath, 2);
-        vector<string> uriParts = split("/", uri);
-        if (uriParts.size() == 0)
-            return false;
-        string lastWord = *(uriParts.end() - 1);
-        string::reverse_iterator dot = find(lastWord.rbegin(), lastWord.rend(), '.');
-        return (string(lastWord.rbegin(), dot) == avaliableExtension);
-    }
-    if (avaliablePath[0] != '/')
-        return false;
+	return match(uri.c_str(), this->path.c_str());
 
-    if (uri == avaliablePath)
-        return true;
-
-    vector<string> uriParts = split("/", uri);
-    vector<string> pathParts = split("/", avaliablePath);
-    vector<string>::iterator pathIter = pathParts.begin();
-    vector<string>::iterator  uriIter = uriParts.begin();
-    while (pathIter != pathParts.end())
-    {
-        if (*pathIter == "*")
-            return true;
-        else if (*pathIter != *uriIter || uriIter == uriParts.end())
-            return false;
-        pathIter++;
-        uriIter++;
-    }
-
-    if (uriIter != uriParts.end() || *(avaliablePath.end() - 1) != *(uri.end() - 1))
-        return false;
-
-    return true;
+//    string avaliablePath = path;
+//
+//    if (avaliablePath[0] == '*' && avaliablePath[1] == '.')
+//    {
+//        string avaliableExtension = string(avaliablePath, 2);
+//        vector<string> uriParts = split("/", uri);
+//        if (uriParts.size() == 0)
+//            return false;
+//        string lastWord = *(uriParts.end() - 1);
+//        string::reverse_iterator dot = find(lastWord.rbegin(), lastWord.rend(), '.');
+//        return (string(lastWord.rbegin(), dot) == avaliableExtension);
+//    }
+//    if (avaliablePath[0] != '/')
+//        return false;
+//
+//    if (uri == avaliablePath)
+//        return true;
+//
+//    vector<string> uriParts = split("/", uri);
+//    vector<string> pathParts = split("/", avaliablePath);
+//    vector<string>::iterator pathIter = pathParts.begin();
+//    vector<string>::iterator  uriIter = uriParts.begin();
+//    while (pathIter != pathParts.end())
+//    {
+//        if (*pathIter == "*")
+//            return true;
+//        else if (*pathIter != *uriIter || uriIter == uriParts.end())
+//            return false;
+//        pathIter++;
+//        uriIter++;
+//    }
+//
+//    if (uriIter != uriParts.end() || *(avaliablePath.end() - 1) != *(uri.end() - 1))
+//        return false;
+//
+//    return true;
 }

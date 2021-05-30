@@ -28,6 +28,7 @@ public:
 	int     readLine(string &result, int fd, unsigned buf_size = 128);
 	int     readBefore(string &result, int fd, string const &needle, unsigned buf_size = 256);
 //	int     readOne(string &result, int fd);
+	bool    isEmpty();
 	int readCount(unsigned long count, int fd);
 	void    clearStorage();
 

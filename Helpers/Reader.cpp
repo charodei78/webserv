@@ -26,13 +26,11 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
 		storage += buf;
 		delete[] buf;
 	}
-	cout << "storage: " << storage << endl;
 
     n_pos = storage.find(needle);
 	if (n_pos == -1)
 		return 1;
 	result = storage.substr(0, n_pos);
-//	cout << "result: " << result << "storage: " << (int)storage[0] << " " << (int)storage[1 ] << endl;
     storage = storage.substr(n_pos + needle.length());
 	return 0;
 }
@@ -77,6 +75,8 @@ int Reader::readCount(unsigned long count, int fd)
 	char *buf = nullptr;
 	size_t read_count;
 
+	cout << count << "  " << fileSize << endl;
+
 	int readSize = count - fileSize;
 
 	if (count <= fileSize)
@@ -114,9 +114,6 @@ int Reader::readCount(unsigned long count, int fd)
 	}
 
 	fileSize += read_count;
-
-	cout << "fileSize " << fileSize << endl;
-
 
 	delete[] buf;
 
@@ -207,4 +204,9 @@ Reader &Reader::operator=(Reader const &rhs)
 int Reader::getStorage(string &result) {
     result = storage;
     return 0;
+}
+
+bool Reader::isEmpty()
+{
+	return storage.empty();
 };

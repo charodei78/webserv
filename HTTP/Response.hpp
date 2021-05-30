@@ -19,7 +19,9 @@ namespace Http {
 		std::string 			response_body;
 		unsigned 				response_status_code;
 		string 					response_status_text;
+
 	public:
+		bool isCgi;
 
 		explicit Response();
 		Response(Response const& rhs);
@@ -31,13 +33,15 @@ namespace Http {
 		Response        *body(const string& body);
 		const string&   body();
 		Response        *header(const string& name, const string& value);
-		const string&   header(const string& name);
+		string          header(const string& name);
 		Response        *statusText(const string& name);
-		string          toString();
+		string toString();
 
 		Response *putFile(const string &path);
 
 		Response *attachDefaultHeaders(Config const &config);
+
+
 	};
 
 	string get_code_message(unsigned int code);

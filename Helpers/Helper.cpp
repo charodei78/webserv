@@ -63,7 +63,7 @@ int     file_put_contents(string filename, int fd, int rights)
 	unsigned        index;
 	int             target;
 	int             count;
-	unsigned char   buf[10240] = {};
+	unsigned char   buf[10240] = {0};
 
 	if (filename.empty())
 		return -1;
@@ -97,6 +97,7 @@ int     file_put_contents(string filename, int fd, int rights)
 		}
 		memset(buf, 0, 10240);
 	} while (count != 0);
+	close(target);
 	return 0;
 }
 
@@ -289,4 +290,132 @@ vector<string> *get_dir_content(string const &path)
 	closedir(dir);
 
 	return result;
+}
+
+string toChunked(string body)
+{
+	int i = 0;
+	int op_size = OPERATION_BYTE_SIZE;
+	int remains;
+	string stringSize;
+
+
+	for (;;) {
+		cout << i << endl;
+		if (i != 0)
+		{
+			body.insert(i, "\r\n");
+			i += 2;
+		}
+		if (body.length() - i <= op_size)
+		{
+			remains = body.length() - i;
+			body.insert(i, itoa(remains, 16) + "\r\n");
+			body += "\r\n0\r\n\r\n";
+			break;
+		} else {
+			stringSize = itoa(op_size, 16) + "\r\n";
+			body.insert(i,   stringSize);
+			i += stringSize.length() + op_size;
+		}
+	}
+
+
+	return body;
+}
+
+int		match(const char *s1, const char *s2)
+{
+	if (*s1 != '\0' && *s2 == '*')
+		return (match(s1 + 1, s2) || match(s1, s2 + 1));
+	if (*s1 == '\0' && *s2 == '*')
+		return (match(s1, s2 + 1));
+	if (*s1 == *s2 && *s1 != '\0' && *s2 != '\0')
+		return (match(s1 + 1, s2 + 1));
+	if (*s1 == '\0' && *s2 == '\0')
+		return (1);
+	return (0);
+}
+
+int		n_match(const char *s1, const char *s2)
+{
+	if (*s1 != '\0' && *s2 == '*')
+		return (max<int>(match(s1 + 1, s2), match(s1, s2 + 1)));
+	if (*s1 == '\0' && *s2 == '*')
+		return (match(s1, s2 + 1));
+	if (*s1 == *s2 && *s1 != '\0' && *s2 != '\0')
+		return (1 + match(s1 + 1, s2 + 1));
+	if (*s1 == '\0' && *s2 == '\0')
+		return (1);
+	return (0);
+}
+
+int cmp_word(string needle, string haystack, int limit)
+{
+	int distances[3];
+
+	if (limit < 0)
+		return 1;
+
+	if (limit < 0 || (needle == "" && haystack == "")) return 0;
+	if (needle.length() == 0 && haystack.length() != 0) return 1 + cmp_word(needle, haystack.substr(1), limit - 1);
+	if (needle.length() != 0 && haystack.length() == 0) return 1 + cmp_word(needle.substr(1), haystack, limit - 1);
+	if (needle[0] == haystack[0]) return cmp_word(needle.substr(1), haystack.substr(1), limit);
+
+
+	// try change
+	limit -= 1;
+	distances[0] = 1 + cmp_word(needle.substr(1), haystack.substr(1), limit);
+	if (distances[0] == 0)
+		return 0;
+	distances[1] = 1 + cmp_word(needle, haystack.substr(1), limit);
+	if (distances[1] == 0)
+		return 0;
+	distances[2] = 1 + cmp_word(needle.substr(1), haystack, limit);
+	if (distances[2] == 0)
+		return 0;
+	return min<int>(min<int>(distances[0], distances[1]), distances[2]);
+}
+
+// unsafe max value;
+
+char      num_to_hex(int value)
+{
+	if (value > 15)
+		return 0;
+	if (value <= 9)
+		return '0' + value;
+	else
+		return 'A' + value - 10;
+}
+
+string    itoa(int value, int base)
+{
+	string sign;
+
+	if (base < 0) {
+		sign = '-';
+		value *= -1;
+	}
+	if (base < 2 )
+		return "";
+	if (value >= base)
+		return sign + itoa(value / base, base) + num_to_hex(value % base);
+	else
+		return sign + num_to_hex(value % base);
+}
+
+string      toUpper(string str)
+{
+	std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+	return str;
+}
+
+string      toCgiHeader(string str)
+{
+	string result = "HTTP_";
+
+	replace(str.begin(), str.end(), '-', '_');
+	str = toUpper(str);
+	return result + str;
 }

@@ -43,6 +43,7 @@ namespace Http {
 		~Request();
 		Request &operator=(Request const &rhs);
 
+		int parseChunkedBody(int fd);
 		string getLog(unsigned int code = 200);
 	};
 

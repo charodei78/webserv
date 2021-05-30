@@ -26,7 +26,7 @@ class CGIRequest
 	string              _cgi_path;
 
 public:
-	string makeQuery( string const& body );
+	string makeQuery(int body_fd );
 	CGIRequest(Http::Request &request, Config &config, sockaddr_in client_addr);
 	~CGIRequest();
 

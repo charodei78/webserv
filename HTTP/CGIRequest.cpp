@@ -114,19 +114,14 @@ CGIRequest::CGIRequest(Http::Request &request, Config& config, sockaddr_in clien
 	}
 
 
-	_env.push_back("HTTP_HOST=" + host);
-	_env.push_back("HTTP_USER_AGENT=" + request.headers["User-Agent"]);
-	_env.push_back("HTTP_ACCEPT=" + request.headers["Accept"]);
-	_env.push_back("HTTP_ACCEPT_LANGUAGE=" + request.headers["Accept-Language"]);
-	_env.push_back("HTTP_ACCEPT_ENCODING=" + request.headers["Accept-Encoding"]);
-	_env.push_back("HTTP_ACCEPT_CHARSET=" + request.headers["Accept-Charset"]);
-	_env.push_back("HTTP_CONNECTION=" + request.headers["Connection"]);
-	_env.push_back("HTTP_REFERER=" + request.headers["Referer"]);
-	_env.push_back("HTTP_X_FORWARDED_FOR=" + request.headers["X-Forwarded-For"]);
+	map<string, string>::iterator it = request.headers.begin();
+	for (;it != request.headers.end(); it++) {
+		_env.push_back(toCgiHeader(it->first) + "=" + it->second);
+	}
 	_env.push_back("");
 }
 
-string CGIRequest::makeQuery( string const& body )
+string CGIRequest::makeQuery(int body_fd )
 {
 	char            *args[2];
 	char            *env[_env.size()];
@@ -134,8 +129,8 @@ string CGIRequest::makeQuery( string const& body )
 	string          result = "";
 	int             status;
 	pid_t           pid;
-	int             fd_in;
-	int             fd_out;
+	int             fd_in = 0;
+	int             fd_out = 0;
 	char            buf[256] = {};
 
 	args[1] = nullptr;
@@ -146,51 +141,51 @@ string CGIRequest::makeQuery( string const& body )
 	program = _cgi_path.substr(_cgi_path.find_last_of('/'));
 	args[0] = (char*)program.c_str();
 
-	fd_in = open(TMP_PATH "/tmp_in.txt", O_CREAT|O_RDWR|O_TRUNC, 0644);
-	if (fd_in == -1){
-		pError("open");
-		return "";
-	}
+	if (exists(TMP_PATH "/tmp_in.txt"))
+		unlink(TMP_PATH "/tmp_in.txt");
+	if (exists(TMP_PATH "/tmp_out.txt"))
+		unlink(TMP_PATH "/tmp_out.txt");
 
-	fd_out = open(TMP_PATH "/tmp_out.txt", O_CREAT|O_RDWR|O_TRUNC, 0644);
-	if (fd_out == -1){
-		pError("open");
-		return "";
-	}
-
-	if (write(fd_in, body.c_str(), body.length()) == -1){
-		pError("write");
-		return "";
-	}
-	lseek(fd_in, 0, 0);
+//	if (write(fd_in, body.c_str(), body.length()) == -1){
+//		pError("write");
+//		return "";
+//	}
+//	lseek(fd_in, 0, 0);
 
 	if ((pid = fork()) == -1){
 		pError("fork");
 		return "";
 	}
 
+	fd_out = open(TMP_PATH "/tmp_out.txt", O_CREAT|O_WRONLY|O_TRUNC, 0644);
+	if (fd_out == -1){
+		pError("open");
+		return "";
+	}
+
 	if (pid == 0) {
 //		dup2(pipes[1], 0);
+		if (body_fd)
+			fd_in = body_fd;
+		else
+			fd_in = open(TMP_PATH "/tmp_in.txt", O_CREAT|O_RDONLY|O_TRUNC, 0644);
+		if (fd_in == -1){
+			pError("open");
+			return "";
+		}
+
 		dup2(fd_in, 0);
 		close(fd_in);
+
 		dup2(fd_out, 1);
 		close(fd_out);
+
 
 		if (execve(_cgi_path.c_str(), args, env) == -1)
 			cerr << _cgi_path.c_str() << " " << strerror(errno) << std::endl;
 	} else {
-		close(fd_in);
 		close(fd_out);
 		waitpid(pid, &status, 0);
-		fd_out = open(TMP_PATH "/tmp_out.txt", O_RDWR, 0644);
-		if (fd_out == -1){
-			pError("open");
-			return "";
-		}
-		while (read(fd_out, buf, 255) > 0) {
-			result += buf;
-			bzero(buf, 255);
-		}
 	}
-	return result;
+	return file_get_contents(TMP_PATH "/tmp_out.txt");
 };
