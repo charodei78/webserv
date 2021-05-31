@@ -32,7 +32,7 @@ enum state
 {
 	requestParsing,
 	sendingResponse,
-	closeConnection
+	resetState
 };
 
 class Client {
@@ -58,6 +58,7 @@ public:
 	RequestParser *requestParser;
 
 
+
     Client &operator=(const Client &src);
     Client(const Client&);
     ~Client();
@@ -66,6 +67,7 @@ public:
     time_t lastOperationTime;
     int getSock();
     int sendResponse();
+    void clear();
 
 
 };

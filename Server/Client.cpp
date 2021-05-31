@@ -48,15 +48,11 @@ int Client::sendResponse() {
 		    sendBuffer += "0\r\n\r\n";
     }
     int sended = send(sock, sendBuffer.c_str(), sendBuffer.length(), 0);
-    if (sendBuffer.length() < 20000)
-		cout << sendBuffer << endl;
-
-	cout << "sended " << sended << endl;
     if (sended <= 0)
         return sended;
 	sendBuffer.erase(0, sended);
     if (responseBuffer.empty() && sendBuffer.empty())
-        currentState = closeConnection;
+        currentState = resetState;
     return 1;
 }
 
@@ -64,7 +60,6 @@ int Client::sendResponse() {
 int Client::readRequest(ServerListener &listener)
 {
 	time(&lastOperationTime);
-	usleep(2000);
 	int ret = requestParser->parse(sock, listener);
 	if (ret == -1)
 	{
@@ -99,6 +94,13 @@ Client &Client::operator=(const Client &src) {
 
 Client::Client(const Client &c) {
     *this = c;
+}
+
+void Client::clear()
+{
+    delete requestParser;
+    Client clearedClient(sock, addr);
+    *this = clearedClient;
 }
 
 Client::~Client() {

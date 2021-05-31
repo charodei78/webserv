@@ -115,7 +115,7 @@ int RequestParser::onError(int code)
 {
 	Server::printLog(addr, request.getLog(code));
 	response.code(code);
-	if (code != 505)
+	if (code < 499)
 		response.attachDefaultHeaders(this->server->serverConfig);
 
 	return 2;
