@@ -60,7 +60,9 @@ int Client::sendResponse() {
 int Client::readRequest(ServerListener &listener)
 {
 	time(&lastOperationTime);
+	usleep(1750);
 	int ret = requestParser->parse(sock, listener);
+
 	if (ret == -1)
 	{
 		pError("What");

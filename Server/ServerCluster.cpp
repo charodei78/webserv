@@ -157,10 +157,8 @@ void ServerCluster::intializeServerListeners() {
 }
 
 void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client *>::iterator &clientIter) {
-    if (FD_ISSET((*clientIter)->getSock(), &writeMasterSet))
-        FD_CLR((*clientIter)->getSock(), &writeMasterSet);
-    if (FD_ISSET((*clientIter)->getSock(), &readMasterSet))
-        FD_CLR((*clientIter)->getSock(), &readMasterSet);
+    FD_CLR((*clientIter)->getSock(), &writeMasterSet);
+    FD_CLR((*clientIter)->getSock(), &readMasterSet);
     close((*clientIter)->getSock());
     delete *clientIter;
     listener.clients.erase(clientIter);

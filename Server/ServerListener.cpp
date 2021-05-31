@@ -41,7 +41,7 @@ bool ServerListener::Intialize()
         return false;
     }
 
-    if (listen(sock, 50) < 0)
+    if (listen(sock, 200) < 0)
         return false;
 
 	cout << "Listener with " << port << " ready to listen\n";
