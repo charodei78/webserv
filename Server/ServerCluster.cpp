@@ -33,17 +33,18 @@ bool ServerCluster::RunServers()
     vector<Client*>::iterator clientIter;
     while (true)
     {
-        timeval timeout = timeoutMaster;
         fd_set readSet;
         fd_set writeSet;
         FD_COPY(&readMasterSet, &readSet);
         FD_COPY(&writeMasterSet, &writeSet);
 
-        int ret = select(max_fd + 1, &readSet, &writeSet, nullptr, &timeout);
+        int ret = select(max_fd + 1, &readSet, &writeSet, nullptr, nullptr);
 
-        if (ret <= 0)
+        if (ret <= 0) {
+            if (ret == -1)
+                cout << "_";
             continue; //100056
-
+        }
         //Проход по каждому серверу
         listenerIter = serverListeners.begin();
         while (listenerIter != serverListeners.end()) {
@@ -59,6 +60,7 @@ bool ServerCluster::RunServers()
 
                     listenerIter->clients.push_back(newClient);
                     FD_SET(newClient->getSock(), &readMasterSet);
+                    FD_SET(newClient->getSock(), &writeMasterSet);
                 }
                 catch (exception)
                 {
@@ -81,11 +83,6 @@ bool ServerCluster::RunServers()
                         closeClientConnection(*listenerIter, clientIter);
                         continue;
                     }
-                    if ((*clientIter)->currentState == sendingResponse)
-                    {
-                        FD_CLR((*clientIter)->getSock(), &readMasterSet);
-                        FD_SET((*clientIter)->getSock(), &writeMasterSet);
-                    }
                 }
 
                 //Запись, если есть куда писать и нужно ли ему писать
@@ -100,10 +97,9 @@ bool ServerCluster::RunServers()
 
                 }
 
-                if ((*clientIter)->currentState == closeConnection)
+                if ((*clientIter)->currentState == checkConnection)
                 {
-                    closeClientConnection(*listenerIter, clientIter);
-                    continue;
+                    (*clientIter)->clear();
                 }
 
                 if (difftime(currentTime, (*clientIter)->lastOperationTime) > OPERATION_TIMEOUT)
@@ -160,11 +156,8 @@ void ServerCluster::intializeServerListeners() {
 }
 
 void ServerCluster::closeClientConnection(ServerListener &listener, vector<Client *>::iterator &clientIter) {
-	cout << "close" << endl;
-    if (FD_ISSET((*clientIter)->getSock(), &writeMasterSet))
-        FD_CLR((*clientIter)->getSock(), &writeMasterSet);
-    if (FD_ISSET((*clientIter)->getSock(), &readMasterSet))
-        FD_CLR((*clientIter)->getSock(), &readMasterSet);
+    FD_CLR((*clientIter)->getSock(), &writeMasterSet);
+    FD_CLR((*clientIter)->getSock(), &readMasterSet);
     close((*clientIter)->getSock());
     delete *clientIter;
     listener.clients.erase(clientIter);

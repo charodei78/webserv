@@ -18,10 +18,10 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
         if (readUsed)
             return 1;
 		if ((counter = read(fd, buf, buf_size)) <= 0) {
-			pError("read");
-			delete[] buf;
-			return -1;
-		}
+            delete[] buf;
+            pError("read");
+            return -1;
+        }
 		readUsed = true;
 		storage += buf;
 		delete[] buf;

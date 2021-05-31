@@ -32,7 +32,7 @@ enum state
 {
 	requestParsing,
 	sendingResponse,
-	closeConnection
+	checkConnection
 };
 
 class Client {
@@ -51,6 +51,7 @@ private:
 
 //	Client();
 public:
+    void clear();
     state currentState;
     Server *server;
 	Http::Request request;
