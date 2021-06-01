@@ -8,11 +8,6 @@ int main(int argc, char **argv)
 
 	signal(SIGPIPE, SIG_IGN);
 
-	if (argc != 2) {
-		cerr << "Pass config, please!" << endl;
-		return 1;
-	}
-
 	ConfigParser parser;
 
 	string config = "./conf/eval.conf";
