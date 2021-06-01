@@ -10,10 +10,10 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
 {
 	string      tmp;
 	long        n_pos = -1;
-	char        *buf = new char[buf_size + 1]{0};
+	char        *buf = new char[buf_size + 1];
 	int         counter = 0;
 
-
+	bzero(buf, buf_size + 1);
 	if (storage.empty() || (n_pos = storage.find(needle)) == -1) {
         if (readUsed)
             return 1;
@@ -91,7 +91,8 @@ int Reader::readCount(unsigned long count, int fd)
 
 	while (!buf) {
 		try {
-			buf = new char[readSize]{0};
+			buf = new char[readSize];
+			bzero(buf, readSize);
 		} catch (std::bad_alloc &e) {
 			buf = nullptr;
 			readSize /= 2;
@@ -107,7 +108,7 @@ int Reader::readCount(unsigned long count, int fd)
 		return -1;
 	}
 
-	if (write(fileFd, buf, read_count) != read_count)  {
+	if (write(fileFd, buf, read_count) != (long)read_count)  {
 		pError("write");
 		delete[] buf;
 		return -1;

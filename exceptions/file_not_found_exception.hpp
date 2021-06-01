@@ -15,9 +15,9 @@ class file_not_found_exception: public exception
 
 public:
 	file_not_found_exception();
-	~file_not_found_exception();
+	~file_not_found_exception() throw();
 
-	const char *what() const _NOEXCEPT override;
+	const char * what() const throw();
 
 };
 

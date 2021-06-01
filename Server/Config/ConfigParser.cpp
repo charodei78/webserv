@@ -18,6 +18,7 @@ void ConfigParser::ParseError()
 
 void ConfigParser::ParseWordsInMap(vector<string> words, map<string, string> &map, int i)
 {
+    (void)i;
     if (*(words[1].end() - 1) != ';')
         ParseError();
     words[1].erase(words[1].end() - 1);
@@ -119,7 +120,7 @@ list<Config> ConfigParser::GetServerConfigs(const string &configFileName)
     string fileContent = file_get_contents(configFileName);
     configLines = split("\n", fileContent);
 
-    for (iter = 0; iter < configLines.size(); iter++)
+    for (iter = 0; iter < (int)configLines.size(); iter++)
     {
         string line = trim(configLines[iter]);
         if (line == "server") //находим сервер => добавляем его, функция парсит его

@@ -103,9 +103,9 @@ bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, i
     }
 
 	if (fieldKey == "client_max_body_size") {
-		if (value.find('k') != -1)
+		if (value.find('k') != (unsigned)-1)
 			fieldRef *= 1024;
-		else if (value.find('M') != -1)
+		else if (value.find('M') != (unsigned)-1)
 			fieldRef *= 1048576;
 	}
 
@@ -170,7 +170,7 @@ string Config::getIndexPath(string path)
 	if (*(--path.end()) != '/')
 		root += '/';
 	
-	for (int i = 0; i < indexes.size(); i++)
+	for (unsigned i = 0; i < indexes.size(); i++)
 	{
 		absPath = root + indexes[i];
 		if (exists(absPath))
@@ -185,6 +185,7 @@ string Config::getIndexPath(string path)
 
 bool Config::isCGI(const string &basicString)
 {
+    (void)basicString;
 	return !this->cgiPath.empty();
 }
 

@@ -10,6 +10,9 @@ int main(int argc, char **argv)
 
 	ConfigParser parser;
 
+	string config = "../conf/eval.conf";
+	cout << argc;
+	(void)argv;
 	try {
 	    list<Config> testConfigs = parser.GetServerConfigs("../conf/eval.conf");
 	    ServerCluster env(testConfigs);

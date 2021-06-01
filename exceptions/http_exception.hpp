@@ -14,15 +14,15 @@ using namespace std;
 namespace Http {
 	class http_exception: public std::exception
 	{
-	public:
-		int code;
-		string message;
-		Config *config;
+		public:
+			int code;
+			string message;
+			Config config;
 
-		http_exception(int code, string what = "", Config *config = nullptr);
-		http_exception &operator=(http_exception const& rhs);
-		~http_exception();
-		const char * what() const noexcept override;
+			http_exception(int code, string what = "", Config *config = nullptr);
+			http_exception &operator=(http_exception const& rhs);
+			~http_exception() throw();
+			const char * what() const throw();
 	};
 };
 

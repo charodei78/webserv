@@ -73,7 +73,7 @@ void Server::SendAuthorizationRequest(const sockaddr_in &addr, const int sock)
 
     response.code(401);
     response.statusText("Unauthorized");
-    response.header("WWW-Authenticate", R"(Basic realm="Access to the staging site", charset="UTF-8")");
+    response.header("WWW-Authenticate", "(Basic realm=\"Access to the staging site\", charset=\"UTF-8\")");
     string resStr = response.toString();
     send(sock, resStr.data(), resStr.length(), MSG_DONTWAIT);
     printLog(addr, "401 Unathorized");
@@ -126,7 +126,7 @@ Server &Server::GetLocationServer(string &uri)
 
 Http::Response Server::getHttpResponse(const sockaddr_in &addr, const int sock, Http::Request *request, Config *config)
 {
-    int result;
+	(void)sock;
     string message;
     string path;
     Http::Response response;
@@ -178,7 +178,7 @@ Http::Response Server::getHttpResponse(const sockaddr_in &addr, const int sock, 
             string webPath = "<a href=\"" + request->query.address;
             if (*(--request->query.address.end()) != '/')
                 webPath += '/';
-            for (int i = 0; i < dirs->size(); i++) {
+            for (unsigned i = 0; i < dirs->size(); i++) {
                 body += webPath + (*dirs)[i] + "\">" + (*dirs)[i] + "</a><br>" ;
             }
             response.body(body);

@@ -46,7 +46,7 @@ private:
     string  sendBuffer;
 	Config  *config;
 
-	string responseBuffer = "";
+	string responseBuffer;
 	bool    responseIsChunked;
 
 //	Client();

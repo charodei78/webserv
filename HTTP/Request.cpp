@@ -75,7 +75,7 @@ Request *Request::parseHeaders(const string &str)
 {
 	vector<string> structure = split("\r\n", str);
 
-	for (int i = 0; i < structure.size(); ++i) {
+	for (unsigned i = 0; i < structure.size(); ++i) {
 		this->headers.insert(split_pair(": ", structure[i])); // TODO: прочитать стандарт насчет пробела
 	}
 	return nullptr;
@@ -107,5 +107,5 @@ int Request::parseChunkedBody(int fd)
 //		*result += body.substr(index, size);
 //		body = body.substr(size + 2);
 //	} while (size != 0);
-	return 0;
+	return fd * 0;
 }

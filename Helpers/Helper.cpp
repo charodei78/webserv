@@ -60,7 +60,7 @@ string file_get_contents(const string& path)
 
 int     file_put_contents(string filename, int fd, int rights)
 {
-	unsigned        index;
+	int        index;
 	int             target;
 	int             count;
 	unsigned char   buf[10240] = {0};
@@ -104,10 +104,11 @@ int     file_put_contents(string filename, int fd, int rights)
 
 int create_dir(string path, int rights)
 {
-	unsigned    index;
+	int    index;
 	int         result;
 	string      target;
 
+	result = 0;
 	if (path[0] != '/')
 		path = abs_path(path);
 	if (is_dir(path))
@@ -127,7 +128,7 @@ int create_dir(string path, int rights)
 
 int file_put_contents(string filename, const string &data, int rights)
 {
-	unsigned    index;
+	int    index;
 	int         fd;
 
 	if (filename.empty())
@@ -189,7 +190,8 @@ string getIP(unsigned long ip)
 
 string last_modified(string path)
 {
-	struct stat buf{};
+	struct stat buf;
+	bzero(&buf, sizeof(struct stat));
 
 	if (stat(path.c_str(), &buf) == -1)
 		return "";
@@ -220,7 +222,6 @@ std::string& trim(std::string& str, const std::string& chars)
 
 string  abs_path(string path) {
 	string  result;
-	int     index;
 	string  tmp;
 	char    buf[512] = {};
 	vector<string> folders;
@@ -231,7 +232,7 @@ string  abs_path(string path) {
 	result = buf;
 	folders = split("/", path);
 
-	for (int i = 0; i < folders.size(); i++) {
+	for (unsigned i = 0; i < folders.size(); i++) {
 		tmp = folders[i];
 		if (tmp == "..")
 			result.erase(result.find_last_of('/'), result.size());
@@ -251,7 +252,8 @@ int pError(string const&program)
 
 bool is_file(string const&path)
 {
-	struct stat buf{};
+	struct stat buf;
+	bzero(&buf, sizeof(struct stat));
 	if (stat(path.c_str(), &buf) == -1)
 		return false;
 	return S_ISREG(buf.st_mode);
@@ -259,7 +261,8 @@ bool is_file(string const&path)
 
 bool is_dir(string const&path)
 {
-	struct stat buf{};
+	struct stat buf;
+	bzero(&buf, sizeof(struct stat));
 	if (stat(path.c_str(), &buf) == -1)
 		return false;
 	return S_ISDIR(buf.st_mode);
@@ -267,7 +270,8 @@ bool is_dir(string const&path)
 
 bool exists(string const&path)
 {
-	struct stat buf{};
+	struct stat buf;
+	bzero(&buf, sizeof(struct stat));
 	if (stat(path.c_str(), &buf) == -1)
 		return false;
 	return true;
@@ -307,7 +311,7 @@ string toChunked(string body)
 			body.insert(i, "\r\n");
 			i += 2;
 		}
-		if (body.length() - i <= op_size)
+		if ((int)body.length() - i <= op_size)
 		{
 			remains = body.length() - i;
 			body.insert(i, itoa(remains, 16) + "\r\n");

@@ -23,16 +23,16 @@ Response * Response::body(const string &body)
 
 string get_mime_type(const string& path)
 {
-	int size = sizeof(Http::codes) / sizeof(int);
+	unsigned size = sizeof(Http::codes) / sizeof(int);
 	size_t      last_entry;
 	string      ext;
 
 	last_entry = path.find_last_of('.');
 	if (last_entry != string::npos) {
 		ext = path.substr(last_entry + 1);
-		for (int i = 0; i < size; ++i)
+		for (unsigned i = 0; i < size; ++i)
 		{
-			if (Http::files_ext[i].find(ext) != -1)
+			if (Http::files_ext[i].find(ext) != (unsigned)-1)
 				return Http::mime[i];
 		}
 	}
@@ -60,12 +60,12 @@ Response *Response::header(const string & name, const string& value)
 
 string Http::get_code_message(unsigned int code)
 {
-	int size = sizeof(Http::codes) / sizeof(int);
+	unsigned size = sizeof(Http::codes) / sizeof(int);
 
-	for (int i = 0; i < size; ++i)
+	for (unsigned i = 0; i < size; ++i)
 	{
-	if (Http::codes[i] == code)
-	return Http::messages[i];
+		if ((unsigned)Http::codes[i] == code)
+			return Http::messages[i];
 	}
 	return "";
 }
@@ -163,7 +163,7 @@ Response &Response::operator=(const string &rhs)
 	vector<string> structure = split("\r\n", message.first);
 
 
-	for (int i = 0; i < structure.size(); ++i) {
+	for (unsigned i = 0; i < structure.size(); ++i) {
 		this->headers.insert(split_pair(": ", structure[i]));
 	}
 

@@ -56,10 +56,11 @@ bool RequestParser::parseChunks(string &str)
 
 int RequestParser::parseChunked(int sock, int bodyLimit)
 {
-	char *buf = new char[READ_SIZE + 1]{0};
+	(void)bodyLimit;
+	char *buf = new char[READ_SIZE + 1];
 	int readRet, writeRet;
-	int index;
 
+	bzero(buf, READ_SIZE + 1);
 	if (!bodyFd)
 	{
 		bodyFd = open(TMP_PATH "/tmp_big_in.txt", O_CREAT | O_RDWR | O_TRUNC, 0644);
@@ -167,7 +168,7 @@ int RequestParser::parse(int sock, ServerListener &listener)
 				return onError(401);
 			//TODO: Проверить правильны ли пришедшие данные, с файла с авторизациями
 		}
-		if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == -1)
+		if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == (unsigned) - 1)
 			return onError(405);
 
 		if (request.headers.count("Content-Length"))

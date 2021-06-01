@@ -131,10 +131,9 @@ string CGIRequest::makeQuery(int body_fd )
 	pid_t           pid;
 	int             fd_in = 0;
 	int             fd_out = 0;
-	char            buf[256] = {};
 
 	args[1] = nullptr;
-	for (int i = 0; i < _env.size(); ++i) {
+	for (unsigned i = 0; i < _env.size(); ++i) {
 		env[i] = (char*)_env[i].c_str();
 	}
 	env[_env.size()] = nullptr;
