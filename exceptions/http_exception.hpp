@@ -21,7 +21,7 @@ namespace Http {
 
 			http_exception(int code, string what = "", Config *config = nullptr);
 			http_exception &operator=(http_exception const& rhs);
-			~http_exception() throw();
+			~http_exception() throw() {}
 			const char * what() const throw();
 	};
 };

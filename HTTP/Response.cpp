@@ -153,7 +153,7 @@ string  Response::header(const string &name)
 	if (!headers.count(name))
 		return "";
 	return headers[name];
-}
+} 
 
 Response &Response::operator=(const string &rhs)
 {

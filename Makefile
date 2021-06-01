@@ -24,34 +24,27 @@ SERVERSRC = $(shell find ./Server -name "*.cpp")
 
 SRC = ${HTTPSRC} ${HELPERSRC} ${EXCEPTIONSRC} ${SERVERSRC} ./main.cpp
 
-OBJ = ${SRC:.cpp=.o} 
+OBJ = ${SRC:.cpp=.o}
 
 CC = clang++
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 ${NAME}: ${OBJ}
 	${CC} ${CFLAGS} ${OBJ} -o ${NAME}
 
 all: ${NAME}
 
-run: ${NAME}
-	./a.out
-
-${OBJ}:
-	${CC} ${CFLAGS} ${HTTPSRC} -c -o ./obj/${HTTPSRC:.cpp=.o}
 
 .cpp.o:
-	${CC} ${CFLAGS} $< -c -o ./obj/$@
+	${CC} ${CFLAGS} $< -c -o $@
 
 bonus: all
 
 clean:
-	rm -f ${OBJ} ${LIB} ${GNLOBJ} ${MLXLIB} ${MLXLIBGEN}
-	make fclean -C libft
-	make fclean -C mlx 
+	rm -f ${OBJ}
 
 fclean:	clean
-		rm -f ${NAME}
+	rm -f ${NAME}
 
 re: fclean all
