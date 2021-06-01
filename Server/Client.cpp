@@ -80,6 +80,7 @@ Client &Client::operator=(const Client &src) {
         return *this;
     if (this != &src) {
     	this->responseIsChunked = src.responseIsChunked;
+    	delete this->requestParser;
     	this->requestParser = new RequestParser(addr);
 	    this->lastOperationTime = src.lastOperationTime;
         this->sock = src.sock;
@@ -95,15 +96,16 @@ Client &Client::operator=(const Client &src) {
 }
 
 Client::Client(const Client &c) {
+	this->requestParser = nullptr;
     *this = c;
 }
 
 void Client::clear()
 {
-    delete requestParser;
     Client clearedClient(sock, addr);
     *this = clearedClient;
 }
 
 Client::~Client() {
+	delete this->requestParser;
 }

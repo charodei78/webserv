@@ -114,7 +114,9 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 
 int RequestParser::onError(int code)
 {
-	Server::printLog(addr, request.getLog(code));
+	if (errno != ECONNRESET && errno != ETIMEDOUT)
+		Server::printLog(addr, request.getLog(code));
+	errno = 0;
 	response.code(code);
 	if (code < 499)
 		response.attachDefaultHeaders(this->server->serverConfig);
@@ -134,6 +136,8 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	string result;
 	int status;
 	int bodyLimit;
+
+	errno = 0;
 
 	reader->readUsed = false;
 	if (!request.query.is_set) {
@@ -168,7 +172,7 @@ int RequestParser::parse(int sock, ServerListener &listener)
 				return onError(401);
 			//TODO: Проверить правильны ли пришедшие данные, с файла с авторизациями
 		}
-		if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == (unsigned) - 1)
+		if (!config->allowedFunctions.empty() && config->allowedFunctions.find(request.query.method) == string::npos)
 			return onError(405);
 
 		if (request.headers.count("Content-Length"))
