@@ -54,13 +54,11 @@ bool RequestParser::parseChunks(string &str)
 	return false;
 }
 
-int RequestParser::parseChunked(int sock, int bodyLimit)
+int RequestParser::parseChunked(int sock, int bodyLimit, bool read_used)
 {
 	(void)bodyLimit;
-	char *buf = new char[READ_SIZE + 1];
 	int readRet, writeRet;
 
-	bzero(buf, READ_SIZE + 1);
 	if (!bodyFd)
 	{
 		bodyFd = open(TMP_PATH "/tmp_big_in.txt", O_CREAT | O_RDWR | O_TRUNC, 0644);
@@ -84,10 +82,16 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 	else
 		sBuf->reserve(READ_SIZE + 1);
 
-	readRet = read(sock, buf, READ_SIZE);
+	if (!read_used) {
+		char *buf = new char[READ_SIZE + 1];
+		bzero(buf, READ_SIZE + 1);
 
-	*sBuf += buf;
-	delete[] buf;
+		readRet = read(sock, buf, READ_SIZE);
+
+		*sBuf += buf;
+		delete[] buf;
+	}
+
 
 	bool res = parseChunks(*sBuf);
 
@@ -101,11 +105,9 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 	if (res)
 		return 0;
 
-	if (readRet < 0)
-	{
-		if (errno == EAGAIN)
-			return 1;
-		return -1;
+	if (!read_used) {
+		if (readRet <= 0)
+			return -1;
 	}
 
 	return 1;
@@ -114,9 +116,7 @@ int RequestParser::parseChunked(int sock, int bodyLimit)
 
 int RequestParser::onError(int code)
 {
-	if (errno != ECONNRESET && errno != ETIMEDOUT)
-		Server::printLog(addr, request.getLog(code));
-	errno = 0;
+	Server::printLog(addr, request.getLog(code));
 	response.code(code);
 	if (code < 499)
 		response.attachDefaultHeaders(this->server->serverConfig);
@@ -136,8 +136,6 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	string result;
 	int status;
 	int bodyLimit;
-
-	errno = 0;
 
 	reader->readUsed = false;
 	if (!request.query.is_set) {
@@ -186,9 +184,8 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	if (config)
 		bodyLimit = config->limitClientBodySize;
 
-
 	if (request.headers["Transfer-Encoding"] == "chunked") {
-		int ret = parseChunked(sock, bodyLimit);
+		int ret = parseChunked(sock, bodyLimit, false);
 		if (bodyLimit && fileSize > bodyLimit)
 			return onError(413);
 		if (ret != 0)
