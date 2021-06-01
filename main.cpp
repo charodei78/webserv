@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	(void)argv;
 	try {
-	    list<Config> testConfigs = parser.GetServerConfigs("../conf/eval.conf");
+	    list<Config> testConfigs = parser.GetServerConfigs(argv[1]);
 	    ServerCluster env(testConfigs);
 	    env.RunServers();
 	} catch (exception &e) {
