@@ -107,4 +107,5 @@ void Client::clear()
 }
 
 Client::~Client() {
+	delete this->requestParser;
 }

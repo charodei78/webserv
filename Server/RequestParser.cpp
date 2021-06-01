@@ -116,6 +116,7 @@ int RequestParser::onError(int code)
 {
 	if (errno != ECONNRESET && errno != ETIMEDOUT)
 		Server::printLog(addr, request.getLog(code));
+	errno = 0;
 	response.code(code);
 	if (code < 499)
 		response.attachDefaultHeaders(this->server->serverConfig);
@@ -135,6 +136,8 @@ int RequestParser::parse(int sock, ServerListener &listener)
 	string result;
 	int status;
 	int bodyLimit;
+
+	errno = 0;
 
 	reader->readUsed = false;
 	if (!request.query.is_set) {

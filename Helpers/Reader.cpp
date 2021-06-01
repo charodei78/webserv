@@ -9,15 +9,16 @@ using namespace std;
 int Reader::readBefore(string &result, int fd, string const &needle, unsigned buf_size)
 {
 	string      tmp;
-	long        n_pos = -1;
-	char        *buf = new char[buf_size + 1];
-	int         counter = 0;
+	long        n_pos;
+	char        *buf;
 
-	bzero(buf, buf_size + 1);
 	if (storage.empty() || (n_pos = storage.find(needle)) == -1) {
         if (readUsed)
             return 1;
-		if ((counter = read(fd, buf, buf_size)) <= 0) {
+		buf = new char[buf_size + 1];
+		bzero(buf, buf_size + 1);
+
+		if (read(fd, buf, buf_size) <= 0) {
 			if (errno != ECONNRESET && errno != ETIMEDOUT)
 				pError("read");
 			delete[] buf;
@@ -128,54 +129,6 @@ int Reader::readCount(unsigned long count, int fd)
 
 	return 1;
 }
-
-
-//int Reader::readCount(unsigned long count, int fd)
-//{
-//	if (count == 0)
-//		return 0;
-//	char *buf = new char[count]{0};
-//	result = storage;
-//	int read_count;
-//
-//	if (count > MAX_STACK_SIZE)
-//		use_file = true;
-//
-//	if (result.length() >= count)
-//	{
-//		storage = result.substr(count + 2);
-//		result = result.substr(0, count);
-//	} else {
-//		if (readUsed)
-//			return 1;
-//		read_count = read(fd, buf, count - result.length());
-//		if (read_count < 1)
-//			return -1;
-//		readUsed = true;
-//		if (use_file)
-//		{
-//			if (!fileFd)
-//			{
-//				fileFd = open(TMP_PATH "/tmp_big_in.txt", O_CREAT|O_RDWR|O_TRUNC, 0644);
-//				if (fileFd == -1){
-//					pError("open");
-//					delete[] buf;
-//					return -1;
-//				}
-//			}
-//			if (write(fileFd, storage.c_str(), storage.length()) || write(fileFd, buf, read_count) != read_count) {
-//				pError("write");
-//				delete[] buf;
-//				return -1;
-//			}
-//		} else {
-//			result += buf;
-//		}
-//		delete[] buf;
-//		storage = "";
-//	}
-//	return 0;
-//}
 
 Reader::Reader(): readUsed(false)
 {
