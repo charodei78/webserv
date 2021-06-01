@@ -32,7 +32,7 @@ string get_mime_type(const string& path)
 		ext = path.substr(last_entry + 1);
 		for (unsigned i = 0; i < size; ++i)
 		{
-			if (Http::files_ext[i].find(ext) != (unsigned)-1)
+			if (Http::files_ext[i].find(ext) != string::npos)
 				return Http::mime[i];
 		}
 	}
@@ -64,7 +64,7 @@ string Http::get_code_message(unsigned int code)
 
 	for (unsigned i = 0; i < size; ++i)
 	{
-		if ((unsigned)Http::codes[i] == code)
+		if (Http::codes[i] == (int)code)
 			return Http::messages[i];
 	}
 	return "";

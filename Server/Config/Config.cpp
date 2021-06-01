@@ -103,9 +103,9 @@ bool Config::parseFieldFromMap(map<string, string> &fieldMap, string fieldKey, i
     }
 
 	if (fieldKey == "client_max_body_size") {
-		if (value.find('k') != (unsigned)-1)
+		if (value.find('k') != string::npos)
 			fieldRef *= 1024;
-		else if (value.find('M') != (unsigned)-1)
+		else if (value.find('M') != string::npos)
 			fieldRef *= 1048576;
 	}
 

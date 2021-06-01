@@ -15,6 +15,8 @@ const char *Http::http_exception::what() const throw()
 	return this->message.c_str();
 }
 
+Http::http_exception::~http_exception() throw() {};
+
 Http::http_exception &Http::http_exception::operator=(const Http::http_exception &rhs)
 {
 	if (this != &rhs)
