@@ -5,3 +5,6 @@ cgi/cgi_clone
 public/file_should_exist_after
 public/post_body
 *.o
+tmp/*
+public/post_body/*
+public/put_test/*
