@@ -28,7 +28,7 @@ OBJ = ${SRC:.cpp=.o}
 
 CC = clang++
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 ${NAME}: ${OBJ}
 	${CC} ${CFLAGS} ${OBJ} -o ${NAME}
@@ -42,9 +42,9 @@ all: ${NAME}
 bonus: all
 
 clean:
-	rm -r ${OBJ}
+	rm -f ${OBJ}
 
 fclean:	clean
-		rm -f ${NAME}
+	rm -f ${NAME}
 
 re: fclean all
