@@ -24,32 +24,32 @@ SERVERSRC = $(shell find ./Server -name "*.cpp")
 
 SRC = ${HTTPSRC} ${HELPERSRC} ${EXCEPTIONSRC} ${SERVERSRC} ./main.cpp
 
-OBJ = ${SRC:.cpp=.o} 
+SRCOBJ = ${SRC:.cpp=.o}
+
+OBJ = ${notdir ${SRCOBJ}}
 
 CC = clang++
 
 CFLAGS = -Wall -Wextra -Werror
 
-${NAME}: ${OBJ}
+${NAME}: compile moveobjs
+
+compile: ${SRCOBJ} ${OBJ}
 	${CC} ${CFLAGS} ${OBJ} -o ${NAME}
+
+moveobjs: ${OBJ}
+	mkdir -p obj
+	mv ${OBJ} obj
 
 all: ${NAME}
 
-run: ${NAME}
-	./a.out
-
-${OBJ}:
-	${CC} ${CFLAGS} ${HTTPSRC} -c -o ./obj/${HTTPSRC:.cpp=.o}
-
 .cpp.o:
-	${CC} ${CFLAGS} $< -c -o ./obj/$@
+	${CC} ${CFLAGS} $< -c
 
 bonus: all
 
 clean:
-	rm -f ${OBJ} ${LIB} ${GNLOBJ} ${MLXLIB} ${MLXLIBGEN}
-	make fclean -C libft
-	make fclean -C mlx 
+	rm -r obj
 
 fclean:	clean
 		rm -f ${NAME}
