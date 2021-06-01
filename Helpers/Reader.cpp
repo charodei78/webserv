@@ -18,9 +18,8 @@ int Reader::readBefore(string &result, int fd, string const &needle, unsigned bu
 		buf = new char[buf_size + 1];
 		bzero(buf, buf_size + 1);
 
-		if (read(fd, buf, buf_size) <= 0) {
-			if (errno != ECONNRESET && errno != ETIMEDOUT)
-				pError("read");
+		int res;
+		if ((res = read(fd, buf, buf_size)) <= 0) {
 			delete[] buf;
 			return -1;
 		}
@@ -104,9 +103,7 @@ int Reader::readCount(unsigned long count, int fd)
 	}
 
 	read_count = read(fd, buf, readSize);
-	if (read_count < 0) {
-		if (errno != ECONNRESET && errno != ETIMEDOUT)
-			pError("read");
+	if (read_count <= 0) {
 		delete buf;
 		return -1;
 	}

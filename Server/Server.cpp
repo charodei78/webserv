@@ -8,8 +8,6 @@ void Server::printLog(sockaddr_in client_addr, const string &message = "")
 		<< " [" << get_http_timestamp() << "] "
          << getIP(client_addr.sin_addr.s_addr) << ":" << client_addr.sin_port << " "
          << message << endl;
-    if (counter == 105466)
-    	cout << "here";
 }
 
 Server::Server(Config config) : serverConfig(config)

@@ -20,7 +20,7 @@ class RequestParser
 
 	int checkStatus(int status);
 	int onError(int code);
-	int parseChunked(int sock, int bodyLimit);
+	int parseChunked(int sock, int bodyLimit, bool read_used);
 
 	int remains;
 	long fileSize;
