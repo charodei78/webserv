@@ -5,8 +5,8 @@
 #ifndef WEBSERV_ENV_H
 #define WEBSERV_ENV_H
 
-#define TMP_PATH "../tmp"
-#define DEFAULT_ERROR_PAGE "../html/error.static_html"
+#define TMP_PATH "./tmp"
+#define DEFAULT_ERROR_PAGE "./html/error.static_html"
 
 #define OPERATION_BYTE_SIZE 32768
 

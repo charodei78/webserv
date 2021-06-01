@@ -12,7 +12,7 @@
 
 NAME = webserv
 
-LIBC = libft/libft.a
+HEADERS = ${shell find . -name "*.hpp"}
 
 HTTPSRC = $(shell find ./HTTP -name "*.cpp")
 
