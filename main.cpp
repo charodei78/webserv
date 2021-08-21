@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
 	ConfigParser parser;
 
-	string config = "./conf/eval.conf";
+	string config = "./conf/default.conf";
 	if (argc > 2)
 	{
 		cerr << "Invlalid parameters\n";

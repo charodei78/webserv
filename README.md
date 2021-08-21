@@ -1,4 +1,34 @@
-![:)](/.secretFolder/VIRUS_TROJAN__PC_KILLER_DONT_OPEN.jpg "This is webserv.")
+# Simple web server like nginx
 
+## **About**
 
-for ((i=1;i<=1000;i++)); do   curl -v --header "Connection: keep-alive" "localhost:80"; done
+This is a learning project that implements the basic functionality of a web server such as nginx.
+
+This program can:
+
+- serve static files
+- control connections
+- use headers
+- use CGI
+- resolve PUT / POST / PATCH request
+- use config
+- support HTTP 1.1
+- something else, don't remember ╰(*° _°*)╯
+
+## **How to build**
+
+Work only on mac
+
+`> make`
+
+## **How to use**
+
+`> webserv [path to config]`
+
+e.g.
+
+`> webserv ./conf/default.conf`
+
+## Authors
+
+This project was done by [@Hheimerd](https://github.com/hheimerd) and [@Re-mouse](https://github.com/re-mouse)
